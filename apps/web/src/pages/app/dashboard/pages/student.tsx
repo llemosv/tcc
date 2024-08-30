@@ -1,31 +1,31 @@
-import { useQuery } from '@tanstack/react-query'
-import { parse } from 'date-fns'
-import { Link } from 'lucide-react'
-import { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { Pie, PieChart } from 'recharts'
-import { toast } from 'sonner'
+import { useQuery } from "@tanstack/react-query";
+import { parse } from "date-fns";
+import { Link } from "lucide-react";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { Pie, PieChart } from "recharts";
+import { toast } from "sonner";
 
-import { getPendingTasks } from '@/api/get-pending-tasks'
-import { getTasks, Task } from '@/api/get-tasks'
-import { getTasksCount } from '@/api/get-tasks-count'
-import { CreateGuidanceSolicitationDialog } from '@/components/create-guidance-solicitation-dialog'
-import { Button } from '@/components/ui/button'
-import { Calendar } from '@/components/ui/calendar'
+import { getPendingTasks } from "@/api/get-pending-tasks";
+import { getTasks, Task } from "@/api/get-tasks";
+import { getTasksCount } from "@/api/get-tasks-count";
+import { CreateGuidanceSolicitationDialog } from "@/components/create-guidance-solicitation-dialog";
+import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card'
+} from "@/components/ui/card";
 import {
   ChartConfig,
   ChartContainer,
   ChartLegend,
   ChartLegendContent,
-} from '@/components/ui/chart'
-import { Dialog, DialogTrigger } from '@/components/ui/dialog'
+} from "@/components/ui/chart";
+import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import {
   Table,
   TableBody,
@@ -33,106 +33,106 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table'
+} from "@/components/ui/table";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from '@/components/ui/tooltip'
-import { useAuth } from '@/hooks/useAuth'
-import { cn } from '@/lib/utils'
+} from "@/components/ui/tooltip";
+import { useAuth } from "@/hooks/useAuth";
+import { cn } from "@/lib/utils";
 
 import {
   getStudentGuidances,
   StudentGuidance,
-} from './api/get-student-guidances'
-import { CardSkeleton } from './partials/card-skeleton'
+} from "../../../../api/get-student-guidances";
+import { CardSkeleton } from "../partials/card-skeleton";
 
 const chartConfig = {
   deliveries: {
-    label: 'Deliveries',
+    label: "Deliveries",
   },
   overdue: {
-    label: 'Em Atraso',
-    color: 'hsl(var(--chart-5))',
+    label: "Em Atraso",
+    color: "hsl(var(--chart-5))",
   },
   pending: {
-    label: 'Pendente',
-    color: 'hsl(var(--chart-3))',
+    label: "Pendente",
+    color: "hsl(var(--chart-3))",
   },
   concluded: {
-    label: 'Entregue',
-    color: 'hsl(var(--chart-2))',
+    label: "Entregue",
+    color: "hsl(var(--chart-2))",
   },
-} satisfies ChartConfig
+} satisfies ChartConfig;
 
 export function StudentDashboard() {
-  const navigate = useNavigate()
-  const { user } = useAuth()
+  const navigate = useNavigate();
+  const { user } = useAuth();
 
-  const [activeId, setActiveId] = useState<number | null>(null)
+  const [activeId, setActiveId] = useState<number | null>(null);
 
   const { data: tccGuidances, isLoading: isLoadingGuidances } = useQuery({
-    queryKey: ['works'],
+    queryKey: ["works"],
     queryFn: () => getStudentGuidances(user!.id),
-  })
+  });
 
   useEffect(() => {
     if (tccGuidances) {
       const activeGuidance = tccGuidances.find(
         (guidance) => guidance.solicitacao_aceita === true,
-      )
+      );
       if (activeGuidance) {
-        setActiveId(activeGuidance.id_orientacao)
+        setActiveId(activeGuidance.id_orientacao);
       }
     }
-  }, [tccGuidances])
+  }, [tccGuidances]);
 
   const { data: pendingTasks, isLoading: isLoadingPendingTasks } = useQuery({
-    queryKey: ['pending-tasks', activeId],
+    queryKey: ["pending-tasks", activeId],
     queryFn: () => getPendingTasks(activeId!),
     enabled: !!activeId,
-  })
+  });
 
   const { data: tasksCalendar, isLoading: isLoadingTasksCalendar } = useQuery({
-    queryKey: ['tasks', activeId],
+    queryKey: ["tasks", activeId],
     queryFn: () => getTasks(activeId!),
     enabled: !!activeId,
     select: (data) => {
       return data.map((task) => {
         return {
-          date: parse(task.previsao_entrega, 'dd/MM/yyyy', new Date()),
+          date: parse(task.previsao_entrega, "dd/MM/yyyy", new Date()),
           title: task.tarefa,
           concluded: !!task.data_finalizacao,
-        }
-      })
+        };
+      });
     },
-  })
+  });
 
   const { data: tasksCount, isLoading: isLoadingTasksCount } = useQuery({
-    queryKey: ['tasks-count', activeId],
+    queryKey: ["tasks-count", activeId],
     queryFn: () => getTasksCount(activeId!),
     enabled: !!activeId,
-  })
+  });
 
   function handleViewProjects(tcc: StudentGuidance) {
     if (
       (!tcc.solicitacao_aceita && !!tcc.data_reprovacao) ||
       (!tcc.solicitacao_aceita && !tcc.data_reprovacao)
     ) {
-      toast.info('Apenas trabalhos ativos podem ter atividades')
-      return
+      toast.info("Apenas trabalhos ativos podem ter atividades");
+      return;
     }
-    navigate(`/works/${tcc.id_orientacao}`)
+    navigate(`/works/${tcc.id_orientacao}`);
   }
 
   function getColor(task: Task) {
-    const date = parse(task.previsao_entrega, 'dd/MM/yyyy', new Date())
+    const date = parse(task.previsao_entrega, "dd/MM/yyyy", new Date());
 
-    if (task.data_finalizacao) return 'text-emerald-500 font-semibold'
-    if (date < new Date()) return 'text-red-500 font-semibold'
-    if (date > new Date()) return 'text-yellow-500 font-semibold'
+    if (task.data_finalizacao) return "text-emerald-500 font-semibold";
+    if (date < new Date()) return "text-red-500 font-semibold";
+    if (date > new Date()) return "text-yellow-500 font-semibold";
   }
   return (
     <div className="grid w-full grid-cols-2 gap-5">
@@ -177,19 +177,19 @@ export function StudentDashboard() {
                         <TableCell>{tcc.previsao_entrega}</TableCell>
                         <TableCell
                           className={cn(
-                            'font-semibold',
+                            "font-semibold",
                             !tcc.solicitacao_aceita && !tcc.data_reprovacao
-                              ? 'text-yellow-500'
+                              ? "text-yellow-500"
                               : !tcc.solicitacao_aceita && tcc.data_reprovacao
-                                ? 'text-red-500 dark:text-red-600'
-                                : 'text-emerald-500',
+                                ? "text-red-500 dark:text-red-600"
+                                : "text-emerald-500",
                           )}
                         >
                           {!tcc.solicitacao_aceita && !tcc.data_reprovacao
-                            ? 'Pendente'
+                            ? "Pendente"
                             : !tcc.solicitacao_aceita && tcc.data_reprovacao
-                              ? 'Não'
-                              : 'Sim'}
+                              ? "Não"
+                              : "Sim"}
                         </TableCell>
                         <TableCell className="cursor-pointer text-center">
                           <TooltipProvider>
@@ -339,5 +339,5 @@ export function StudentDashboard() {
         </Card>
       )}
     </div>
-  )
+  );
 }

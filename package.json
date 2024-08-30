@@ -2,11 +2,13 @@
   "name": "tcc",
   "version": "1.0.0",
   "private": true,
+  "packageManager": "npm@10.8.2",
   "scripts": {
-    "dev": "turbo run dev"
+    "dev": "turbo run dev",
+    "build": "turbo build"
   },
   "devDependencies": {
-    "turbo": "^1.7.4"
+    "turbo": "^2.1.1"
   },
   "workspaces": [
     "apps/*"

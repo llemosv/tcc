@@ -1,18 +1,13 @@
-import { useMutation } from '@tanstack/react-query'
 import { AxiosError } from 'axios'
 import { Helmet } from 'react-helmet-async'
 import { useForm } from 'react-hook-form'
-import { Link, useSearchParams } from 'react-router-dom'
 import { toast } from 'sonner'
 import { z } from 'zod'
 
-// import { signIn } from '@/api/sign-in'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useAuth } from '@/hooks/useAuth'
-
-import { signIn } from './api/sign-in'
 
 const signInForm = z.object({
   email: z.string().email(),
@@ -29,10 +24,6 @@ export function SignIn() {
     handleSubmit,
     formState: { isSubmitting, isValid },
   } = useForm<SignInForm>()
-
-  const { mutateAsync: authenticate } = useMutation({
-    mutationFn: signIn,
-  })
 
   async function handleSignIn(data: SignInForm) {
     try {
@@ -75,7 +66,7 @@ export function SignIn() {
               <Input id="senha" type="password" {...register('senha')} />
             </div>
 
-            <Button type="submit" disabled={isSubmitting}>
+            <Button type="submit" disabled={!isValid || isSubmitting}>
               Acessar
             </Button>
           </form>

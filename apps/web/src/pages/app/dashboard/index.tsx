@@ -2,9 +2,9 @@ import { Helmet } from 'react-helmet-async'
 
 import { useAuth } from '@/hooks/useAuth'
 
-import { CoordinatorDashboard } from './pages/coordinator/coordinator-dashboard'
-import { StudentDashboard } from './pages/student/student-dashboard'
-import { TeacherDashboard } from './pages/teacher/teacher-dashboard'
+import { CoordinatorDashboard } from './pages/coordinator'
+import { StudentDashboard } from './pages/student'
+import { TeacherDashboard } from './pages/teacher'
 
 export function Dashboard() {
   const { user } = useAuth()

@@ -1,13 +1,10 @@
-import { Bell, ChevronDown, Info, LogOut } from 'lucide-react'
-
-import { useAuth } from '@/hooks/useAuth'
+import { Bell, Info } from 'lucide-react'
 
 import { Button } from './ui/button'
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from './ui/dropdown-menu'
