@@ -10,13 +10,14 @@ export interface StudentGuidance {
   data_aprovacao: string | null
   data_reprovacao: string | null
   justificativa_reprovacao: string | null
+  total_atividades: number
 }
 
 export async function getStudentGuidances(
-  student_id: number,
+  studentId: number,
 ): Promise<StudentGuidance[]> {
   const response = await api.get<StudentGuidance[]>(
-    `/tccGuidances/findGuidancesStudent/${student_id}`,
+    `/tccGuidances/findGuidancesStudent/${studentId}`,
   )
 
   return response.data

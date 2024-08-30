@@ -23,7 +23,7 @@ export function Works() {
 
   const { data: works, isLoading: isLoadingGuidances } = useQuery({
     queryKey: ['works'],
-    queryFn: () => getStudentGuidances(user?.id!),
+    queryFn: () => getStudentGuidances(user!.id),
   })
 
   function handleViewProjects(id: number | string) {
@@ -46,7 +46,9 @@ export function Works() {
       {isLoadingGuidances ? (
         <CardSkeleton />
       ) : works?.length === 0 ? (
-        <p>criat trabai</p>
+        <div className="flex h-[50vh] items-center justify-center">
+          <h3 className="text-2xl font-semibold">Nenhum trabalho cadastrado</h3>
+        </div>
       ) : (
         works &&
         works.map((work) => (
@@ -55,10 +57,12 @@ export function Works() {
               <CardTitle>{work.tema}</CardTitle>
               <div className="flex justify-between">
                 <CardDescription>
-                  Orientador: <strong>{work.orientador}</strong>
+                  Orientador:{' '}
+                  <span className="font-semibold">{work.orientador}</span>
                 </CardDescription>
                 <CardDescription>
-                  Previsão de entrega: <strong>{work.previsao_entrega}</strong>
+                  Previsão de entrega:{' '}
+                  <span className="font-semibold">{work.previsao_entrega}</span>
                 </CardDescription>
               </div>
               <div className="flex justify-between">
@@ -73,26 +77,31 @@ export function Works() {
                   )}
                 >
                   Status orientação:{' '}
-                  <strong>
+                  <span className="font-semibold">
                     {' '}
                     {!work.solicitacao_aceita && !work.data_reprovacao
                       ? 'Pendente'
                       : !work.solicitacao_aceita && work.data_reprovacao
                         ? 'Recusada'
                         : 'Aceita'}
-                  </strong>
+                  </span>
                 </CardDescription>
                 {work.justificativa_reprovacao && (
                   <CardDescription>
                     Justificativa:{' '}
-                    <strong>{work.justificativa_reprovacao}</strong>
+                    <span className="font-semibold">
+                      {work.justificativa_reprovacao}
+                    </span>
                   </CardDescription>
                 )}
               </div>
             </CardHeader>
             <CardContent className="flex justify-between">
               <p>
-                Total de atividades: <strong className="text-primary">0</strong>
+                Total de atividades:{' '}
+                <span className="font-semibold text-primary">
+                  {work.total_atividades}
+                </span>
               </p>
               <a
                 className="cursor-pointer text-muted-foreground transition-colors hover:text-foreground"

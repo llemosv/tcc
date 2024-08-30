@@ -1,3 +1,4 @@
+import { useQueryClient } from '@tanstack/react-query'
 import Cookies from 'js-cookie'
 import {
   createContext,
@@ -42,6 +43,7 @@ export const AuthContext = createContext({} as SingInContextType)
 
 export function AuthProvider({ children }: AuthContextProviderProps) {
   const navigate = useNavigate()
+  const queryClient = useQueryClient()
 
   const [user, setUser] = useState<User | null>(() => {
     const storageUser = Cookies.get('gerenciadortcc::user')
@@ -89,7 +91,7 @@ export function AuthProvider({ children }: AuthContextProviderProps) {
     api.defaults.headers.common.authorization = `Bearer ${auth.data.token}`
 
     navigate('/')
-    console.log(auth.data.user)
+
     setUser(auth.data.user)
     setToken(auth.data.token)
   }
@@ -103,13 +105,13 @@ export function AuthProvider({ children }: AuthContextProviderProps) {
       }
     })
 
-    navigate('/sign-in')
 
+    queryClient.clear();
     setUser(null)
-
     setToken(null)
-
     setName(null)
+
+    navigate('/sign-in')
   }, [navigate, setUser, setToken, setName])
 
   useEffect(() => {

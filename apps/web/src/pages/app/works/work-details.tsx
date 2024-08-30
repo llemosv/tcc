@@ -19,11 +19,13 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip'
-import { useAuth } from '@/hooks/useAuth'
+
+// import { useAuth } from '@/hooks/useAuth'
+import { CardSkeleton } from './partials/card-skeleton'
 
 export function WorkDetails() {
   const navigate = useNavigate()
-  const { user } = useAuth()
+  // const { user } = useAuth()
   const { id } = useParams<{ id: string }>()
 
   const { data: tasks, isLoading: isLoadingGuidances } = useQuery({
@@ -34,7 +36,7 @@ export function WorkDetails() {
   function getStatus(task: Task) {
     const date = parse(task.previsao_entrega, 'dd/MM/yyyy', new Date())
 
-    if(task.data_finalizacao) return 'Entregue'
+    if (task.data_finalizacao) return 'Entregue'
     if (date < new Date()) return 'Atrasado'
     if (date > new Date()) return 'Pendente'
   }
@@ -42,7 +44,7 @@ export function WorkDetails() {
   function getColor(task: Task) {
     const date = parse(task.previsao_entrega, 'dd/MM/yyyy', new Date())
 
-    if(task.data_finalizacao) return 'text-emerald-500 font-semibold'
+    if (task.data_finalizacao) return 'text-emerald-500 font-semibold'
     if (date < new Date()) return 'text-red-500 font-semibold'
     if (date > new Date()) return 'text-yellow-500 font-semibold'
   }
@@ -68,48 +70,52 @@ export function WorkDetails() {
         <Button>Cadastrar atividade</Button>
       </div>
 
-      <Table>
-        <TableHeader>
-          <TableRow>
-            {/* <TableHead>Trabalho</TableHead> */}
-            <TableHead>Tarefa</TableHead>
-            <TableHead>Início atividade</TableHead>
-            <TableHead>Previsão de Entrega</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead>Ações</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {tasks &&
-            tasks.map((task) => (
-              <TableRow key={task.id}>
-                <TableCell>{task.tarefa}</TableCell>
-                <TableCell>{task.data_criacao}</TableCell>
-                <TableCell>{task.previsao_entrega}</TableCell>
-                <TableCell className={getColor(task)}>
-                  {getStatus(task)}
-                </TableCell>
-                <TableCell className="cursor-pointer text-left">
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger>
-                        <Link
-                          // onClick={() =>
-                          //   handleViewProjects(tcc.id_orientacao)
-                          // }
-                          className="h-5 w-5 hover:text-primary"
-                        />
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>Visualizar atividade</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-                </TableCell>
-              </TableRow>
-            ))}
-        </TableBody>
-      </Table>
+      {isLoadingGuidances ? (
+        <CardSkeleton />
+      ) : (
+        <Table>
+          <TableHeader>
+            <TableRow>
+              {/* <TableHead>Trabalho</TableHead> */}
+              <TableHead>Tarefa</TableHead>
+              <TableHead>Início atividade</TableHead>
+              <TableHead>Previsão de Entrega</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead>Ações</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {tasks &&
+              tasks.map((task) => (
+                <TableRow key={task.id}>
+                  <TableCell>{task.tarefa}</TableCell>
+                  <TableCell>{task.data_criacao}</TableCell>
+                  <TableCell>{task.previsao_entrega}</TableCell>
+                  <TableCell className={getColor(task)}>
+                    {getStatus(task)}
+                  </TableCell>
+                  <TableCell className="cursor-pointer text-left">
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger>
+                          <Link
+                            // onClick={() =>
+                            //   handleViewProjects(tcc.id_orientacao)
+                            // }
+                            className="h-5 w-5 hover:text-primary"
+                          />
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Visualizar atividade</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  </TableCell>
+                </TableRow>
+              ))}
+          </TableBody>
+        </Table>
+      )}
     </>
   )
 }

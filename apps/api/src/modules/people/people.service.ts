@@ -82,8 +82,6 @@ export class PeopleService {
           and people_courses.course_id = ${id_course}
       `);
 
-      console.log(teachers);
-
       return teachers;
     } catch (error) {
       throw new BadRequestException(error);

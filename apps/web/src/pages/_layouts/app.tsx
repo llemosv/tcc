@@ -11,7 +11,7 @@ export function AppLayout() {
   const navigate = useNavigate()
   const outlet = useOutlet()
 
-  if (!user && !token) {
+  if (!user || !token) {
     return <Navigate to="/sign-in" />
   }
 

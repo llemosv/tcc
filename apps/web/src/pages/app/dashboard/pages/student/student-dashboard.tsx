@@ -9,6 +9,7 @@ import { toast } from 'sonner'
 import { getPendingTasks } from '@/api/get-pending-tasks'
 import { getTasks, Task } from '@/api/get-tasks'
 import { getTasksCount } from '@/api/get-tasks-count'
+import { CreateGuidanceSolicitationDialog } from '@/components/create-guidance-solicitation-dialog'
 import { Button } from '@/components/ui/button'
 import { Calendar } from '@/components/ui/calendar'
 import {
@@ -24,6 +25,7 @@ import {
   ChartLegend,
   ChartLegendContent,
 } from '@/components/ui/chart'
+import { Dialog, DialogTrigger } from '@/components/ui/dialog'
 import {
   Table,
   TableBody,
@@ -46,24 +48,6 @@ import {
   StudentGuidance,
 } from './api/get-student-guidances'
 import { CardSkeleton } from './partials/card-skeleton'
-
-// mock
-const deliveries = [
-  {
-    id: 'dsa3fgd34-safas412-fdsfsdf3',
-    advisor: 'Humberto Melo',
-    deliveryForecast: '30/08/2024',
-    title: 'Revisão de código',
-    theme: "Desenvolvimento de um sistema para gerenciar TCC's",
-  },
-  {
-    id: 'sgd3fgd34-das9867321k-fdsfsdf3',
-    advisor: 'Humberto Melo',
-    deliveryForecast: '16/09/2024',
-    title: 'Entrega primeira parte do projeto',
-    theme: "Desenvolvimento de um sistema para gerenciar TCC's",
-  },
-]
 
 const chartConfig = {
   deliveries: {
@@ -91,7 +75,7 @@ export function StudentDashboard() {
 
   const { data: tccGuidances, isLoading: isLoadingGuidances } = useQuery({
     queryKey: ['works'],
-    queryFn: () => getStudentGuidances(user?.id!),
+    queryFn: () => getStudentGuidances(user!.id),
   })
 
   useEffect(() => {
@@ -110,6 +94,7 @@ export function StudentDashboard() {
     queryFn: () => getPendingTasks(activeId!),
     enabled: !!activeId,
   })
+
   const { data: tasksCalendar, isLoading: isLoadingTasksCalendar } = useQuery({
     queryKey: ['tasks', activeId],
     queryFn: () => getTasks(activeId!),
@@ -161,8 +146,14 @@ export function StudentDashboard() {
           </CardHeader>
           <CardContent className="flex">
             {tccGuidances && tccGuidances.length === 0 ? (
-              <div className="flex h-full w-full items-center justify-center p-16">
-                <Button>Solicitar orientação</Button>
+              <div className="flex h-full w-full items-center justify-center p-28">
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button type="button">Solicitar orientação</Button>
+                  </DialogTrigger>
+
+                  <CreateGuidanceSolicitationDialog />
+                </Dialog>
               </div>
             ) : (
               <Table>
@@ -224,7 +215,7 @@ export function StudentDashboard() {
         </Card>
       )}
 
-      {isLoadingGuidances || isLoadingTasksCalendar ? (
+      {isLoadingGuidances || isLoadingPendingTasks ? (
         <CardSkeleton />
       ) : (
         <Card>
@@ -236,7 +227,7 @@ export function StudentDashboard() {
           </CardHeader>
           <CardContent>
             {!pendingTasks ? (
-              <div className="flex items-center justify-center p-32">
+              <div className="flex items-center justify-center p-28">
                 <h3 className="text-xl font-semibold">
                   Nenhuma atividade cadastrada
                 </h3>

@@ -36,21 +36,34 @@ export class TccGuidancesService {
 
   async findGuidancesStudent(id_aluno: number): Promise<any> {
     const result = await this.database.execute(sql`
-      SELECT tcc_guidances.id      AS id_orientacao,
-            aluno.nome       AS aluno,
-            prof.nome        AS orientador,
+      SELECT tcc_guidances.id AS id_orientacao,
+            aluno.nome AS aluno,
+            prof.nome AS orientador,
             tcc_guidances.tema,
             TO_CHAR(tcc_guidances.previsao_entrega, 'DD/MM/YYYY') AS previsao_entrega,
             tcc_guidances.solicitacao_aceita,
-            tcc_guidances.data_aprovacao,
-            tcc_guidances.data_reprovacao,
-            tcc_guidances.justificativa_reprovacao
+            TO_CHAR(tcc_guidances.data_aprovacao, 'DD/MM/YYYY') AS data_aprovacao,
+            TO_CHAR(tcc_guidances.data_reprovacao, 'DD/MM/YYYY') AS data_reprovacao,
+            tcc_guidances.justificativa_reprovacao,
+            COUNT(tasks.id) AS total_atividades
       FROM   tcc_guidances
             JOIN people AS aluno
               ON aluno.id = tcc_guidances.id_aluno_solicitante
             JOIN people AS prof
               ON prof.id = tcc_guidances.id_professor_orientador
+            LEFT JOIN tasks 
+              ON tasks.id_tcc = tcc_guidances.id
       WHERE  tcc_guidances.id_aluno_solicitante = ${id_aluno}
+      GROUP BY tcc_guidances.id,
+              aluno.nome,
+              prof.nome,
+              tcc_guidances.tema,
+              tcc_guidances.previsao_entrega,
+              tcc_guidances.solicitacao_aceita,
+              tcc_guidances.data_aprovacao,
+              tcc_guidances.data_reprovacao,
+              tcc_guidances.justificativa_reprovacao;
+
     `);
 
     return result;

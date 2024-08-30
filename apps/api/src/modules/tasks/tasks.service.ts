@@ -33,6 +33,7 @@ export class TasksService {
              TO_CHAR(tasks.data_finalizacao, 'DD/MM/YYYY') as data_finalizacao
       from tasks 
       where id_tcc = ${id_tcc}
+      order by data_criacao
       `);
 
     return response;
@@ -40,14 +41,16 @@ export class TasksService {
 
   async getPendingTasks(id_tcc: number): Promise<TaskDTO[]> {
     const response = await this.database.execute(sql`
-      select tasks.id, 
-             tasks.tarefa, 
-             TO_CHAR(tasks.data_criacao, 'DD/MM/YYYY') as data_criacao, 
-             TO_CHAR(tasks.previsao_entrega, 'DD/MM/YYYY') as previsao_entrega,
-             TO_CHAR(tasks.data_finalizacao, 'DD/MM/YYYY') as data_finalizacao
-      from tasks 
-      where id_tcc = ${id_tcc}
-      and data_finalizacao is null
+      SELECT tasks.id, 
+            tasks.tarefa, 
+            TO_CHAR(tasks.data_criacao, 'DD/MM/YYYY') AS data_criacao, 
+            TO_CHAR(tasks.previsao_entrega, 'DD/MM/YYYY') AS previsao_entrega,
+            TO_CHAR(tasks.data_finalizacao, 'DD/MM/YYYY') AS data_finalizacao
+      FROM   tasks 
+      WHERE  id_tcc = ${id_tcc}
+            AND data_finalizacao IS NULL
+      ORDER BY tasks.previsao_entrega;
+
       `);
 
     return response;
