@@ -1,0 +1,1 @@
+ALTER TABLE "courses" ADD COLUMN "semesters" integer NOT NULL;

@@ -1,0 +1,14 @@
+{
+  "name": "tcc",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "turbo run dev"
+  },
+  "devDependencies": {
+    "turbo": "^1.7.4"
+  },
+  "workspaces": [
+    "apps/*"
+  ]
+}
