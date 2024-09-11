@@ -1,8 +1,8 @@
 import { api } from '@/lib/axios'
 
 export interface CreateGuidanceSolicitation {
-  id_aluno_solicitante: number
-  id_professor_orientador: number
+  id_aluno_solicitante: string
+  id_professor_orientador: string
   solicitacao_aceita: boolean
   tema: string
   previsao_entrega: string

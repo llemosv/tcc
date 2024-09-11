@@ -1,15 +1,15 @@
 import { api } from '@/lib/axios'
 
 export interface Task {
-  id: number
+  id: string
   tarefa: string
   data_criacao: string
   previsao_entrega: string
   data_finalizacao: string
 }
 
-export async function getPendingTasks(id_trabalho: number): Promise<Task[]> {
-  const response = await api.get<Task[]>(`/tasks/pending/${id_trabalho}`)
+export async function getPendingTasks(idTrabalho: string): Promise<Task[]> {
+  const response = await api.get<Task[]>(`/tasks/pending/${idTrabalho}`)
 
   return response.data
 }

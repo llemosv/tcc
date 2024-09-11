@@ -1,17 +1,15 @@
-import { Body, Controller, Post, Res, UsePipes } from '@nestjs/common';
+import { Body, Controller, Post, Res } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { Response } from 'express';
 
 import { AuthDTO, authSchema } from './dtos/auth.dto';
 import { ZodValidationPipe } from 'src/core/pipes/zod-validation.pipe';
-import { LocalAuthGuard } from './strategies/local.strategy';
 
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post()
-  @UsePipes(LocalAuthGuard)
   async login(
     @Body(new ZodValidationPipe(authSchema)) authDto: AuthDTO,
     @Res() response: Response,

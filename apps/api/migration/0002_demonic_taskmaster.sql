@@ -1,0 +1,1 @@
+ALTER TABLE "topic_files" ALTER COLUMN "data_upload" SET DEFAULT now();

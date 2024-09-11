@@ -20,6 +20,7 @@ export function AppLayout() {
       (response) => response,
       (error) => {
         if (isAxiosError(error)) {
+          console.log('blu',error)
           const status = error.response?.status
           if (status === 401) {
             signOut()

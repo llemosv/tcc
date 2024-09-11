@@ -10,12 +10,14 @@ export function Works() {
   return (
     <>
       <Helmet title="Trabalhos" />
-      <h3 className="pb-2 text-2xl font-semibold leading-none tracking-tight">
-        Dashboard
-      </h3>
-      {/* {user?.tipo_pessoa === 1 && <CoordinatorWorks />}
-      {user?.tipo_pessoa === 2 && <TeacherWorks />} */}
-      {user?.tipo_pessoa === 3 && <StudentWorks />}
+
+      {/* {user?.tipo_pessoa === 1 && <CoordinatorWorks />} */}
+      {user?.tipo_pessoa === 'b6a95883-9949-4d23-b220-1f3af6c8f7ea' && (
+        <StudentWorks />
+      )}
+      {user?.tipo_pessoa === '842b617d-0558-4d48-89bc-a1b53f1c3c87' && (
+        <StudentWorks />
+      )}
     </>
   )
   return <></>

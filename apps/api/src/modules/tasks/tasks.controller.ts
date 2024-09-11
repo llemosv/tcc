@@ -1,18 +1,10 @@
-import {
-  Body,
-  Controller,
-  Get,
-  Param,
-  Post,
-  Put,
-  UseGuards,
-} from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
 import { ZodValidationPipe } from 'src/core/pipes/zod-validation.pipe';
-import { AuthGuard } from '@nestjs/passport';
 import { TasksService } from './tasks.service';
 import { TaskDTO, createTaskSchema } from './dtos/create-task.dto';
+import { AuthGuard } from '../auth/auth.guard';
 
-@UseGuards(AuthGuard('jwt'))
+@UseGuards(AuthGuard)
 @Controller('tasks')
 export class TasksController {
   constructor(private readonly tasksService: TasksService) {}
@@ -26,7 +18,7 @@ export class TasksController {
   }
 
   @Get(':id')
-  async getTasks(@Param('id') id: number) {
+  async getTasks(@Param('id') id: string) {
     return await this.tasksService.getTasks(id);
   }
 

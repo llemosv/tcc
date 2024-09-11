@@ -8,7 +8,6 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { ZodValidationPipe } from 'src/core/pipes/zod-validation.pipe';
-import { AuthGuard } from '@nestjs/passport';
 import { TccGuidancesService } from './tcc-guidances.service';
 import {
   CreateTccGuidanceDTO,
@@ -18,8 +17,9 @@ import {
   RespondGuidanceRequestDTO,
   respondGuidanceRequestSchema,
 } from './dtos/respond-to-guidance-request.dto';
+import { AuthGuard } from '../auth/auth.guard';
 
-@UseGuards(AuthGuard('jwt'))
+@UseGuards(AuthGuard)
 @Controller('tccGuidances')
 export class TccGuidancesController {
   constructor(private readonly tccGuidancesService: TccGuidancesService) {}
@@ -32,9 +32,12 @@ export class TccGuidancesController {
     return await this.tccGuidancesService.create(createSolicitationDto);
   }
 
-  @Get('findGuidancesStudent/:id')
-  async findGuidancesStudent(@Param('id') id: number) {
-    return await this.tccGuidancesService.findGuidancesStudent(id);
+  @Get('findGuidances/:id/:type')
+  async findGuidancesStudent(
+    @Param('id') id: string,
+    @Param('type') type: 'aluno' | 'orientador',
+  ) {
+    return await this.tccGuidancesService.findGuidancesStudent(id, type);
   }
 
   @Put('respondToGuidanceRequest/:id')

@@ -1,1 +1,0 @@
-ALTER TABLE "tasks" RENAME COLUMN "data_reprovacao" TO "data_finalizacao";

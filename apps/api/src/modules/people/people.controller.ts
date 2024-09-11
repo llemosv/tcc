@@ -2,9 +2,9 @@ import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
 import { PeopleService } from './people.service';
 import { CreatePeopleDTO, createPeopleSchema } from './dtos/people.dto';
 import { ZodValidationPipe } from 'src/core/pipes/zod-validation.pipe';
-import { AuthGuard } from '@nestjs/passport';
+import { AuthGuard } from '../auth/auth.guard';
 
-@UseGuards(AuthGuard('jwt'))
+@UseGuards(AuthGuard)
 @Controller('people')
 export class PeopleController {
   constructor(private readonly peopleService: PeopleService) {}

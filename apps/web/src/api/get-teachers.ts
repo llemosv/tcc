@@ -7,8 +7,8 @@ export interface Teacher {
   curso: string
 }
 
-export async function getTeachers(id_course: number): Promise<Teacher[]> {
-  const response = await api.get<Teacher[]>(`/people/getTeachers/${id_course}`)
+export async function getTeachers(idCourse: string): Promise<Teacher[]> {
+  const response = await api.get<Teacher[]>(`/people/getTeachers/${idCourse}`)
 
   return response.data
 }

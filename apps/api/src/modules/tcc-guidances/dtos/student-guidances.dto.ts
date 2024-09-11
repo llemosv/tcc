@@ -1,5 +1,5 @@
 export interface StudentGuidancesDTO {
-  id_orientacao: number;
+  id_orientacao: string;
   aluno: string;
   orientador: string;
   tema: string;

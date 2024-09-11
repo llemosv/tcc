@@ -19,11 +19,11 @@ interface AuthContextProviderProps {
 }
 
 interface User {
-  id: number
+  id: string
   name: string
   email: string
-  tipo_pessoa: number
-  id_curso: number
+  tipo_pessoa: string
+  id_curso: string
 }
 
 interface SignInProps {

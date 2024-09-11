@@ -1,1 +1,0 @@
-ALTER TABLE "tasks" ALTER COLUMN "data_criacao" SET NOT NULL;

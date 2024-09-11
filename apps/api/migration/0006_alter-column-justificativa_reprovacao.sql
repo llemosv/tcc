@@ -1,1 +1,0 @@
-ALTER TABLE "tcc_guidances" RENAME COLUMN "justificativa" TO "justificativa_reprovacao";

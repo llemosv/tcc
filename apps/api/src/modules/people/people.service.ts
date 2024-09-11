@@ -47,7 +47,7 @@ export class PeopleService {
         }
 
         await Promise.all(
-          id_courses.map(async (id: number) => {
+          id_courses.map(async (id: string) => {
             await db.insert(schema.peopleCourses).values({
               course_id: id,
               people_id: person.id,
@@ -78,7 +78,7 @@ export class PeopleService {
               courses 
               on courses.id = people_courses.course_id 
         where
-          people.id_tipo_pessoa = 2
+          people.id_tipo_pessoa = 'b6a95883-9949-4d23-b220-1f3af6c8f7ea'
           and people_courses.course_id = ${id_course}
       `);
 

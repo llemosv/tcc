@@ -13,31 +13,47 @@ import {
 import { Dialog, DialogTrigger } from '@/components/ui/dialog'
 import { useAuth } from '@/hooks/useAuth'
 import { cn } from '@/lib/utils'
+import { getUserType } from '@/utils/get-user-type'
 
-import { getStudentGuidances } from '../../../../api/get-student-guidances'
+import { getGuidances, Guidance } from '../../../../api/get-guidances'
 import { CardSkeleton } from '../partials/card-skeleton'
 
 export function StudentWorks() {
+  const userType = getUserType()
   const navigate = useNavigate()
   const { user } = useAuth()
 
   const { data: works, isLoading: isLoadingGuidances } = useQuery({
     queryKey: ['works'],
-    queryFn: () => getStudentGuidances(user!.id),
+    queryFn: () => getGuidances(user!.id, userType),
   })
 
   function handleViewProjects(id: number | string) {
     navigate(`/works/${id}`)
   }
+
+  function validateSolicitation(works: Guidance[]): boolean {
+    return works.some(
+      (work) =>
+        work.solicitacao_aceita === true ||
+        (!work.solicitacao_aceita && !work.data_reprovacao),
+    )
+  }
+
   return (
     <div className="space-y-4">
-      <div className="flex justify-between text-center">
+      <div className="flex items-center justify-between">
         <h3 className="text-2xl font-semibold leading-none tracking-tight">
           Trabalhos
         </h3>
         <Dialog>
           <DialogTrigger asChild>
-            <Button type="button">Solicitar orientação</Button>
+            <Button
+              type="button"
+              disabled={works && validateSolicitation(works)}
+            >
+              Solicitar orientação
+            </Button>
           </DialogTrigger>
 
           <CreateGuidanceSolicitationDialog />
@@ -103,12 +119,13 @@ export function StudentWorks() {
                   {work.total_atividades}
                 </span>
               </p>
-              <a
-                className="cursor-pointer text-muted-foreground transition-colors hover:text-foreground"
+              <button
+                className="cursor-pointer text-muted-foreground transition-colors hover:text-foreground disabled:cursor-default disabled:text-muted-foreground/50"
                 onClick={() => handleViewProjects(work.id_orientacao)}
+                disabled={!work.solicitacao_aceita}
               >
                 Visualizar trabalho
-              </a>
+              </button>
             </CardContent>
           </Card>
         ))

@@ -4,6 +4,15 @@
 @tailwind components;
 @tailwind utilities;
 
+.no-scrollbar::-webkit-scrollbar {
+  display: none; /* Safari and Chrome */
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
 /* calendar.css */
 .fc .fc-button-primary {
   background-color: transparent;
@@ -15,7 +24,6 @@
   border-color: var(--fc-button-border-color);
   color: var(--fc-button-text-color);
 }
-
 
 @layer base {
   :root {

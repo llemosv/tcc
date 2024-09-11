@@ -9,12 +9,10 @@ import { AuthModule } from './modules/auth/auth.module';
 import { PeopleModule } from './modules/people/people.module';
 import { TccGuidancesModule } from './modules/tcc-guidances/tcc-guidances.module';
 import { TasksModule } from './modules/tasks/tasks.module';
+import { TopicsModule } from './modules/topics/topics.module';
 
 @Module({
   imports: [
-    AuthModule,
-    PeopleModule,
-    TccGuidancesModule,
     ConfigModule.forRoot({ isGlobal: true }),
     NestDrizzleModule.forRootAsync({
       useFactory: () => {
@@ -26,6 +24,10 @@ import { TasksModule } from './modules/tasks/tasks.module';
         };
       },
     }),
+    AuthModule,
+    PeopleModule,
+    TccGuidancesModule,
+    TopicsModule,
     TasksModule,
   ],
   controllers: [AppController],

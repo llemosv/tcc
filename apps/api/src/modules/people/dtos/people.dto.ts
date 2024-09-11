@@ -5,9 +5,9 @@ export const createPeopleSchema = z.object({
   email: z.string(),
   senha: z.string(),
   fl_ativo: z.boolean(),
-  id_tipo_pessoa: z.number().int(),
-  id_courses: z.array(z.number().int()),
+  id_tipo_pessoa: z.string().uuid(),
+  id_courses: z.array(z.string().uuid()),
 });
 
 export type CreatePeopleDTO = z.infer<typeof createPeopleSchema>;
-export type PeopleDTO = { id: number } & z.infer<typeof createPeopleSchema>;
+export type PeopleDTO = { id: string } & z.infer<typeof createPeopleSchema>;

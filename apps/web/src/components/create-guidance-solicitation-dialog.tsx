@@ -88,7 +88,7 @@ export function CreateGuidanceSolicitationDialog() {
   ) {
     await create({
       id_aluno_solicitante: user?.id!,
-      id_professor_orientador: Number(data.id_professor_orientador),
+      id_professor_orientador: data.id_professor_orientador,
       previsao_entrega: data.previsao_entrega,
       solicitacao_aceita: false,
       tema: data.tema,

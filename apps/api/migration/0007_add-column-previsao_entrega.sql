@@ -1,1 +1,0 @@
-ALTER TABLE "tcc_guidances" ADD COLUMN "previsao_entrega" date NOT NULL;

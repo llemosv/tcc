@@ -1,7 +1,5 @@
 import * as schema from 'src/shared/database/schema';
-
 import { Inject, Injectable, Logger } from '@nestjs/common';
-
 import { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 import { DRIZZLE_ORM } from 'src/core/constrants/db.constants';
 import { TaskDTO } from './dtos/create-task.dto';
@@ -24,7 +22,7 @@ export class TasksService {
       .values({ id_tcc, tarefa, data_criacao, previsao_entrega });
   }
 
-  async getTasks(id_tcc: number): Promise<TaskDTO[]> {
+  async getTasks(id_tcc: string): Promise<TaskDTO[]> {
     const response = await this.database.execute(sql`
       select tasks.id, 
              tasks.tarefa, 

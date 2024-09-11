@@ -5,8 +5,9 @@ import { Inject, Injectable, Logger } from '@nestjs/common';
 import { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 import { DRIZZLE_ORM } from 'src/core/constrants/db.constants';
 import { CreateTccGuidanceDTO } from './dtos/create-tcc-guidance.dto';
-import { sql } from 'drizzle-orm';
+import { eq, sql } from 'drizzle-orm';
 import { RespondGuidanceRequestDTO } from './dtos/respond-to-guidance-request.dto';
+import { alias } from 'drizzle-orm/pg-core';
 
 @Injectable()
 export class TccGuidancesService {
@@ -34,37 +35,52 @@ export class TccGuidancesService {
     });
   }
 
-  async findGuidancesStudent(id_aluno: number): Promise<any> {
-    const result = await this.database.execute(sql`
-      SELECT tcc_guidances.id AS id_orientacao,
-            aluno.nome AS aluno,
-            prof.nome AS orientador,
-            tcc_guidances.tema,
-            TO_CHAR(tcc_guidances.previsao_entrega, 'DD/MM/YYYY') AS previsao_entrega,
-            tcc_guidances.solicitacao_aceita,
-            TO_CHAR(tcc_guidances.data_aprovacao, 'DD/MM/YYYY') AS data_aprovacao,
-            TO_CHAR(tcc_guidances.data_reprovacao, 'DD/MM/YYYY') AS data_reprovacao,
-            tcc_guidances.justificativa_reprovacao,
-            COUNT(tasks.id) AS total_atividades
-      FROM   tcc_guidances
-            JOIN people AS aluno
-              ON aluno.id = tcc_guidances.id_aluno_solicitante
-            JOIN people AS prof
-              ON prof.id = tcc_guidances.id_professor_orientador
-            LEFT JOIN tasks 
-              ON tasks.id_tcc = tcc_guidances.id
-      WHERE  tcc_guidances.id_aluno_solicitante = ${id_aluno}
-      GROUP BY tcc_guidances.id,
-              aluno.nome,
-              prof.nome,
-              tcc_guidances.tema,
-              tcc_guidances.previsao_entrega,
-              tcc_guidances.solicitacao_aceita,
-              tcc_guidances.data_aprovacao,
-              tcc_guidances.data_reprovacao,
-              tcc_guidances.justificativa_reprovacao;
+  async findGuidancesStudent(
+    id: string,
+    type: 'aluno' | 'orientador',
+  ): Promise<any> {
+    const alunoPeople = alias(schema.people, 'aluno');
+    const orientadorPeople = alias(schema.people, 'orientador');
 
-    `);
+    const result = await this.database
+      .select({
+        id_orientacao: schema.tccGuidances.id,
+        aluno: alunoPeople.nome,
+        orientador: orientadorPeople.nome,
+        tema: schema.tccGuidances.tema,
+        previsao_entrega: sql<string>`TO_CHAR(${schema.tccGuidances.previsao_entrega}, 'DD/MM/YYYY')`,
+        solicitacao_aceita: schema.tccGuidances.solicitacao_aceita,
+        data_aprovacao: sql<string>`TO_CHAR(${schema.tccGuidances.data_aprovacao}, 'DD/MM/YYYY')`,
+        data_reprovacao: sql<string>`TO_CHAR(${schema.tccGuidances.data_reprovacao}, 'DD/MM/YYYY')`,
+        justificativa_reprovacao: schema.tccGuidances.justificativaReprovacao,
+        total_atividades: sql<number>`COUNT(${schema.tasks.id})`,
+      })
+      .from(schema.tccGuidances)
+      .innerJoin(
+        alunoPeople,
+        eq(alunoPeople.id, schema.tccGuidances.id_aluno_solicitante),
+      )
+      .innerJoin(
+        orientadorPeople,
+        eq(orientadorPeople.id, schema.tccGuidances.id_professor_orientador),
+      )
+      .leftJoin(schema.tasks, eq(schema.tasks.id_tcc, schema.tccGuidances.id))
+      .where(
+        type === 'aluno'
+          ? eq(schema.tccGuidances.id_aluno_solicitante, id)
+          : eq(schema.tccGuidances.id_professor_orientador, id),
+      )
+      .groupBy(
+        schema.tccGuidances.id,
+        alunoPeople.nome,
+        orientadorPeople.nome,
+        schema.tccGuidances.tema,
+        schema.tccGuidances.previsao_entrega,
+        schema.tccGuidances.solicitacao_aceita,
+        schema.tccGuidances.data_aprovacao,
+        schema.tccGuidances.data_reprovacao,
+        schema.tccGuidances.justificativaReprovacao,
+      );
 
     return result;
   }

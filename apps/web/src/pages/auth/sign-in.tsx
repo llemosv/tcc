@@ -1,3 +1,4 @@
+import { zodResolver } from '@hookform/resolvers/zod'
 import { AxiosError } from 'axios'
 import { Helmet } from 'react-helmet-async'
 import { useForm } from 'react-hook-form'
@@ -23,12 +24,16 @@ export function SignIn() {
     register,
     handleSubmit,
     formState: { isSubmitting, isValid },
-  } = useForm<SignInForm>()
+  } = useForm<SignInForm>({
+    resolver: zodResolver(signInForm),
+  })
 
   async function handleSignIn(data: SignInForm) {
     try {
       await signIn({ email: data.email, senha: data.senha })
     } catch (error) {
+      console.log('error', error)
+
       if (error instanceof AxiosError) {
         const errorMessage =
           error.response?.data?.message || 'Erro ao acessar o painel'

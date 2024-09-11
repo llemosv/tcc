@@ -2,9 +2,8 @@ import { RouteProps } from 'react-router-dom'
 
 import { Dashboard } from '@/pages/app/dashboard/'
 import { Works } from '@/pages/app/works'
-import { WorkDetails } from '@/pages/app/works/work-details'
-
-// import { Orders } from './pages/app/orders/orders'
+import { TaskTopics } from '@/pages/app/works/task-topics'
+import { Tasks } from '@/pages/app/works/tasks'
 
 export const authRoutes: RouteProps[] = [
   {
@@ -17,6 +16,10 @@ export const authRoutes: RouteProps[] = [
   },
   {
     path: '/works/:id',
-    element: <WorkDetails />,
+    element: <Tasks />,
+  },
+  {
+    path: '/works/:idTcc/topics/:idTask',
+    element: <TaskTopics />,
   },
 ]

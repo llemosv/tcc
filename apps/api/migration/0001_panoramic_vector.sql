@@ -1,0 +1,1 @@
+ALTER TABLE "topic_messages" ALTER COLUMN "data_criacao" SET DEFAULT now();

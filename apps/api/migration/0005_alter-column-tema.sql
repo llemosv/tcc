@@ -1,1 +1,0 @@
-ALTER TABLE "tcc_guidances" RENAME COLUMN "nome_projeto" TO "tema";

@@ -19,10 +19,10 @@ export default [
     plugins: {
       'simple-import-sort': simpleImportSort,
     },
-
     rules: {
       'simple-import-sort/imports': 'error',
-      '@typescript-eslint/no-non-null-assertion': 'off',
+      camelcase: 'off',
+      '@typescript-eslint/no-non-null-asserted-optional-chain': 'off',
     },
   },
 ]

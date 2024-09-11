@@ -6,7 +6,7 @@ export interface TasksCount {
   fill: string
 }
 
-export async function getTasksCount(id_task: number): Promise<TasksCount[]> {
+export async function getTasksCount(id_task: string): Promise<TasksCount[]> {
   const response = await api.get<TasksCount[]>(`/tasks/count/${id_task}`)
 
   return response.data

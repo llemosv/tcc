@@ -5,78 +5,29 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1724781158605,
-      "tag": "0000_create-people-table",
+      "when": 1725809989831,
+      "tag": "0000_great_mauler",
       "breakpoints": true
     },
     {
       "idx": 1,
       "version": "7",
-      "when": 1724852416765,
-      "tag": "0001_create-courses-table",
+      "when": 1725974196491,
+      "tag": "0001_panoramic_vector",
       "breakpoints": true
     },
     {
       "idx": 2,
       "version": "7",
-      "when": 1724852558164,
-      "tag": "0002_add-semesters-courses",
+      "when": 1725974292344,
+      "tag": "0002_demonic_taskmaster",
       "breakpoints": true
     },
     {
       "idx": 3,
       "version": "7",
-      "when": 1724852954457,
-      "tag": "0003_alter-table-names",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "7",
-      "when": 1724937739299,
-      "tag": "0004_create-table-tcc-guidances",
-      "breakpoints": true
-    },
-    {
-      "idx": 5,
-      "version": "7",
-      "when": 1724938025175,
-      "tag": "0005_alter-column-tema",
-      "breakpoints": true
-    },
-    {
-      "idx": 6,
-      "version": "7",
-      "when": 1724938153249,
-      "tag": "0006_alter-column-justificativa_reprovacao",
-      "breakpoints": true
-    },
-    {
-      "idx": 7,
-      "version": "7",
-      "when": 1724938707012,
-      "tag": "0007_add-column-previsao_entrega",
-      "breakpoints": true
-    },
-    {
-      "idx": 8,
-      "version": "7",
-      "when": 1725014378579,
-      "tag": "0008_add-table-tasks",
-      "breakpoints": true
-    },
-    {
-      "idx": 9,
-      "version": "7",
-      "when": 1725014445566,
-      "tag": "0009_add-column-data_criacao",
-      "breakpoints": true
-    },
-    {
-      "idx": 10,
-      "version": "7",
-      "when": 1725020061949,
-      "tag": "0010_alter-column-data_finalizacao",
+      "when": 1725994151387,
+      "tag": "0003_smiling_rocket_racer",
       "breakpoints": true
     }
   ]

@@ -9,16 +9,17 @@ import { DRIZZLE_ORM } from 'src/core/constrants/db.constants';
 import { AuthDTO } from './dtos/auth.dto';
 
 import * as schema from 'src/shared/database/schema';
-import * as jwt from 'jsonwebtoken';
 import * as bcrypt from 'bcrypt';
 import { sql } from 'drizzle-orm';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthService {
-  private readonly jwtSecret: string = String(process.env.JWT_SECRET_KEY);
+  // private readonly jwtSecret: string = String(process.env.JWT_SECRET_KEY);
 
   constructor(
     @Inject(DRIZZLE_ORM) private database: PostgresJsDatabase<typeof schema>,
+    private jwtService: JwtService,
   ) {}
 
   async validateUser(authDTO: AuthDTO) {
@@ -68,7 +69,7 @@ export class AuthService {
 
     return {
       user: people,
-      token: jwt.sign(payload, this.jwtSecret, { expiresIn: '1h' }),
+      token: await this.jwtService.signAsync(payload),
     };
   }
 }
