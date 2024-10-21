@@ -33,11 +33,11 @@ export class TccGuidancesController {
   }
 
   @Get('findGuidances/:id/:type')
-  async findGuidancesStudent(
+  async findGuidances(
     @Param('id') id: string,
     @Param('type') type: 'aluno' | 'orientador',
   ) {
-    return await this.tccGuidancesService.findGuidancesStudent(id, type);
+    return await this.tccGuidancesService.findGuidances(id, type);
   }
 
   @Put('respondToGuidanceRequest/:id')

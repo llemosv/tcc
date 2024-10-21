@@ -35,10 +35,7 @@ export class TccGuidancesService {
     });
   }
 
-  async findGuidancesStudent(
-    id: string,
-    type: 'aluno' | 'orientador',
-  ): Promise<any> {
+  async findGuidances(id: string, type: 'aluno' | 'orientador'): Promise<any> {
     const alunoPeople = alias(schema.people, 'aluno');
     const orientadorPeople = alias(schema.people, 'orientador');
 
