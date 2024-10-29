@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Patch,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
 import { ZodValidationPipe } from 'src/core/pipes/zod-validation.pipe';
 import { TasksService } from './tasks.service';
 import { TaskDTO, createTaskSchema } from './dtos/create-task.dto';
@@ -15,6 +23,12 @@ export class TasksController {
     createTaskDto: TaskDTO,
   ) {
     return await this.tasksService.create(createTaskDto);
+  }
+
+  @Patch(':id/conclude')
+  async concludeTask(@Param('id') id: string) {
+    console.log(id);
+    return await this.tasksService.concludeTask(id);
   }
 
   @Get(':id')

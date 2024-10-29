@@ -5,7 +5,7 @@ import { Inject, Injectable, Logger } from '@nestjs/common';
 import { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 import { DRIZZLE_ORM } from 'src/core/constrants/db.constants';
 import { CreateTccGuidanceDTO } from './dtos/create-tcc-guidance.dto';
-import { eq, sql } from 'drizzle-orm';
+import { sql, and, eq, like, isNull, not } from 'drizzle-orm';
 import { RespondGuidanceRequestDTO } from './dtos/respond-to-guidance-request.dto';
 import { alias } from 'drizzle-orm/pg-core';
 
@@ -35,11 +35,49 @@ export class TccGuidancesService {
     });
   }
 
-  async findGuidances(id: string, type: 'aluno' | 'orientador'): Promise<any> {
+  async findGuidances(
+    id: string,
+    type: 'aluno' | 'orientador',
+    name?: string,
+    status?: 'refused' | 'pending' | 'accepted',
+  ): Promise<any> {
     const alunoPeople = alias(schema.people, 'aluno');
     const orientadorPeople = alias(schema.people, 'orientador');
+    console.log(type);
+    const conditions = [
+      type === 'aluno'
+        ? eq(schema.tccGuidances.id_aluno_solicitante, id)
+        : eq(schema.tccGuidances.id_professor_orientador, id),
+    ];
 
-    const result = await this.database
+    if (name) {
+      conditions.push(
+        type === 'aluno'
+          ? like(orientadorPeople.nome, `%${name}%`)
+          : like(alunoPeople.nome, `%${name}%`),
+      );
+    }
+
+    if (status) {
+      switch (status) {
+        case 'accepted':
+          conditions.push(eq(schema.tccGuidances.solicitacao_aceita, true));
+          break;
+        case 'refused':
+          conditions.push(not(isNull(schema.tccGuidances.data_reprovacao)));
+          break;
+        case 'pending':
+          conditions.push(
+            and(
+              isNull(schema.tccGuidances.solicitacao_aceita),
+              isNull(schema.tccGuidances.data_reprovacao),
+            ),
+          );
+          break;
+      }
+    }
+
+    const query = this.database
       .select({
         id_orientacao: schema.tccGuidances.id,
         aluno: alunoPeople.nome,
@@ -62,11 +100,7 @@ export class TccGuidancesService {
         eq(orientadorPeople.id, schema.tccGuidances.id_professor_orientador),
       )
       .leftJoin(schema.tasks, eq(schema.tasks.id_tcc, schema.tccGuidances.id))
-      .where(
-        type === 'aluno'
-          ? eq(schema.tccGuidances.id_aluno_solicitante, id)
-          : eq(schema.tccGuidances.id_professor_orientador, id),
-      )
+      .where(and(...conditions))
       .groupBy(
         schema.tccGuidances.id,
         alunoPeople.nome,
@@ -77,9 +111,16 @@ export class TccGuidancesService {
         schema.tccGuidances.data_aprovacao,
         schema.tccGuidances.data_reprovacao,
         schema.tccGuidances.justificativaReprovacao,
+      )
+      .orderBy(
+        sql`CASE 
+               WHEN ${schema.tccGuidances.solicitacao_aceita} = true THEN 1 
+               WHEN ${schema.tccGuidances.solicitacao_aceita} IS NULL AND ${schema.tccGuidances.data_reprovacao} IS NULL THEN 2 
+               ELSE 3 
+             END`,
       );
 
-    return result;
+    return await query;
   }
 
   async respondToGuidanceRequest(

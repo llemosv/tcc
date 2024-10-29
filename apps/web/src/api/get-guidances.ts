@@ -13,12 +13,27 @@ export interface Guidance {
   total_atividades: number
 }
 
-export async function getGuidances(
-  studentId: string,
-  type: 'aluno' | 'orientador' | 'coordenador',
-): Promise<Guidance[]> {
+interface IGetGuidances {
+  studentId: string
+  type: 'aluno' | 'orientador' | 'coordenador'
+  name?: string | null
+  status?: string | null
+}
+
+export async function getGuidances({
+  studentId,
+  type,
+  name = null,
+  status = null,
+}: IGetGuidances): Promise<Guidance[]> {
   const response = await api.get<Guidance[]>(
     `/tccGuidances/findGuidances/${studentId}/${type}`,
+    {
+      params: {
+        name,
+        status,
+      },
+    },
   )
 
   return response.data

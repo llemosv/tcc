@@ -25,7 +25,7 @@ export function StudentWorks() {
 
   const { data: works, isLoading: isLoadingGuidances } = useQuery({
     queryKey: ['works'],
-    queryFn: () => getGuidances(user!.id, userType),
+    queryFn: () => getGuidances({ studentId: user?.id!, type: userType }),
   })
 
   function handleViewProjects(id: number | string) {

@@ -27,7 +27,7 @@ import { env } from '@/env'
 import { useAuth } from '@/hooks/useAuth'
 import { cn } from '@/lib/utils'
 
-const socket = io(env.VITE_SOCKET_URL)
+const socket = io(env.VITE_SOCKET_URL, { transports: ['websocket'] })
 
 interface MessageSheetProps {
   topic: Topics

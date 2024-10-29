@@ -1,10 +1,13 @@
 import { useQuery } from '@tanstack/react-query'
-import { ArrowLeft, Link } from 'lucide-react'
+import { ArrowLeft, Check, Link } from 'lucide-react'
 import { Helmet } from 'react-helmet-async'
 import { useNavigate, useParams } from 'react-router-dom'
 
 import { getTasks } from '@/api/get-tasks'
+import { ConcludeTaskDialog } from '@/components/conclude-task-dialog'
+import { CreateTaskDialog } from '@/components/create-task-dialog'
 import { Button } from '@/components/ui/button'
+import { Dialog, DialogTrigger } from '@/components/ui/dialog'
 import {
   Table,
   TableBody,
@@ -20,6 +23,7 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip'
 import { useAuth } from '@/hooks/useAuth'
+import { cn } from '@/lib/utils'
 
 import { getColor } from '../../../utils/get-color'
 import { getStatus } from '../../../utils/get-status'
@@ -59,17 +63,30 @@ export function Tasks() {
           Atividades
         </h3>
 
-        <Button
-          disabled={
-            user?.tipo_pessoa === '842b617d-0558-4d48-89bc-a1b53f1c3c87'
-          }
-        >
-          Cadastrar
-        </Button>
+        <Dialog>
+          <DialogTrigger asChild>
+            <Button
+              type="button"
+              disabled={
+                user?.tipo_pessoa === '842b617d-0558-4d48-89bc-a1b53f1c3c87'
+              }
+            >
+              Cadastrar
+            </Button>
+          </DialogTrigger>
+
+          <CreateTaskDialog id_tcc={id!} />
+        </Dialog>
       </div>
 
       {isLoadingGuidances ? (
         <CardSkeleton />
+      ) : tasks?.length === 0 ? (
+        <div className="flex h-[50vh] items-center justify-center">
+          <h3 className="text-2xl font-semibold">
+            Nenhuma atividade encontrada
+          </h3>
+        </div>
       ) : (
         <Table>
           <TableHeader>
@@ -96,10 +113,10 @@ export function Tasks() {
                   >
                     {getStatus(task.previsao_entrega, task.data_finalizacao)}
                   </TableCell>
-                  <TableCell className="cursor-pointer text-left">
+                  <TableCell className="flex cursor-pointer items-center gap-2 text-left">
                     <TooltipProvider>
                       <Tooltip>
-                        <TooltipTrigger>
+                        <TooltipTrigger asChild>
                           <Link
                             onClick={() => handleViewActivity(task.id)}
                             className="h-5 w-5 hover:text-primary"
@@ -107,6 +124,29 @@ export function Tasks() {
                         </TooltipTrigger>
                         <TooltipContent>
                           <p>Visualizar atividade</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger>
+                          <Dialog>
+                            <DialogTrigger asChild>
+                              <button
+                                type="button"
+                                className={`text-foreground ${task.data_finalizacao ? 'cursor-default text-muted-foreground' : 'cursor-pointer hover:text-green-600'}`}
+                                disabled={!!task.data_finalizacao}
+                              >
+                                <Check />
+                              </button>
+                            </DialogTrigger>
+
+                            <ConcludeTaskDialog id={task.id} />
+                          </Dialog>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Marcar como concluído</p>
                         </TooltipContent>
                       </Tooltip>
                     </TooltipProvider>

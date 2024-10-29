@@ -5,29 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1725809989831,
-      "tag": "0000_great_mauler",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1725974196491,
-      "tag": "0001_panoramic_vector",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1725974292344,
-      "tag": "0002_demonic_taskmaster",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "7",
-      "when": 1725994151387,
-      "tag": "0003_smiling_rocket_racer",
+      "when": 1730229173045,
+      "tag": "0000_notification",
       "breakpoints": true
     }
   ]

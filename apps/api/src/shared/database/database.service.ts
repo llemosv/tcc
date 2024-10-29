@@ -34,7 +34,10 @@ export class DatabaseService implements IDatabaseService {
     let client: postgres.Sql<Record<string, never>>;
 
     if (!this._drizzle) {
-      client = postgres(this._NestDrizzleOptions.url);
+      client = postgres(this._NestDrizzleOptions.url, {
+        ssl: { rejectUnauthorized: false },
+        prepare: false,
+      });
       try {
         await client`SELECT 1`; // Sending a test query to check connection
         this.logger.log('Database connected successfully');

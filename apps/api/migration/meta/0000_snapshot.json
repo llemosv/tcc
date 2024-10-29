@@ -1,5 +1,5 @@
 {
-  "id": "a3d73328-5bd9-469c-b2dc-91d96be41b27",
+  "id": "f7fe9876-04d5-4e5f-9778-9df45fd49fcf",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -30,6 +30,123 @@
         "semesters": {
           "name": "semesters",
           "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "public.notification": {
+      "name": "notification",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "id_tipo_notificacao": {
+          "name": "id_tipo_notificacao",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "id_usuario_remetente": {
+          "name": "id_usuario_remetente",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "id_usuario_destinatario": {
+          "name": "id_usuario_destinatario",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "mensagem": {
+          "name": "mensagem",
+          "type": "varchar(254)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "lida": {
+          "name": "lida",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "id_referencia": {
+          "name": "id_referencia",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "notification_id_tipo_notificacao_notification_type_id_fk": {
+          "name": "notification_id_tipo_notificacao_notification_type_id_fk",
+          "tableFrom": "notification",
+          "tableTo": "notification_type",
+          "columnsFrom": [
+            "id_tipo_notificacao"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "notification_id_usuario_remetente_people_id_fk": {
+          "name": "notification_id_usuario_remetente_people_id_fk",
+          "tableFrom": "notification",
+          "tableTo": "people",
+          "columnsFrom": [
+            "id_usuario_remetente"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "notification_id_usuario_destinatario_people_id_fk": {
+          "name": "notification_id_usuario_destinatario_people_id_fk",
+          "tableFrom": "notification",
+          "tableTo": "people",
+          "columnsFrom": [
+            "id_usuario_destinatario"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "public.notification_type": {
+      "name": "notification_type",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "tipo": {
+          "name": "tipo",
+          "type": "varchar(100)",
           "primaryKey": false,
           "notNull": true
         }
@@ -431,9 +548,10 @@
         },
         "data_upload": {
           "name": "data_upload",
-          "type": "date",
+          "type": "timestamp",
           "primaryKey": false,
-          "notNull": true
+          "notNull": true,
+          "default": "now()"
         }
       },
       "indexes": {},
@@ -486,9 +604,10 @@
         },
         "data_criacao": {
           "name": "data_criacao",
-          "type": "date",
+          "type": "timestamp",
           "primaryKey": false,
-          "notNull": true
+          "notNull": true,
+          "default": "now()"
         }
       },
       "indexes": {},

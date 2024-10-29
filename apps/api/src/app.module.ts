@@ -10,6 +10,7 @@ import { PeopleModule } from './modules/people/people.module';
 import { TccGuidancesModule } from './modules/tcc-guidances/tcc-guidances.module';
 import { TasksModule } from './modules/tasks/tasks.module';
 import { TopicsModule } from './modules/topics/topics.module';
+import { NotificationsModule } from './modules/notifications/notifications.module';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { TopicsModule } from './modules/topics/topics.module';
     TccGuidancesModule,
     TopicsModule,
     TasksModule,
+    NotificationsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

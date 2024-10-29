@@ -1,15 +1,24 @@
 import * as schema from 'src/shared/database/schema';
-import { Inject, Injectable, Logger } from '@nestjs/common';
+import {
+  BadRequestException,
+  Inject,
+  Injectable,
+  InternalServerErrorException,
+  Logger,
+  NotFoundException,
+} from '@nestjs/common';
 import { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 import { DRIZZLE_ORM } from 'src/core/constrants/db.constants';
 import { TaskDTO } from './dtos/create-task.dto';
-import { sql } from 'drizzle-orm';
+import { eq, sql } from 'drizzle-orm';
 import { TasksCount } from './dtos/tasks.count.dto';
+import { NotificationsService } from '../notifications/notifications.service';
 
 @Injectable()
 export class TasksService {
   constructor(
     @Inject(DRIZZLE_ORM) private database: PostgresJsDatabase<typeof schema>,
+    private readonly notificationsService: NotificationsService,
   ) {}
 
   private readonly logger = new Logger(TasksService.name);
@@ -17,9 +26,38 @@ export class TasksService {
   async create(createTaskDto: TaskDTO): Promise<void> {
     const { id_tcc, tarefa, data_criacao, previsao_entrega } = createTaskDto;
 
-    await this.database
-      .insert(schema.tasks)
-      .values({ id_tcc, tarefa, data_criacao, previsao_entrega });
+    try {
+      await this.database
+        .insert(schema.tasks)
+        .values({ id_tcc, tarefa, data_criacao, previsao_entrega });
+
+      const [work] = await this.database
+        .select()
+        .from(schema.tccGuidances)
+        .where(eq(schema.tccGuidances.id, id_tcc));
+
+      if (!work) {
+        throw new NotFoundException(
+          `Orientação com ID ${id_tcc} não encontrada.`,
+        );
+      }
+
+      await this.notificationsService.create({
+        recipientUserId: work.id_aluno_solicitante,
+        senderUserId: work.id_professor_orientador,
+        message: `Nova atividade criada no trabalho ${work.tema}.`,
+        type: 'novaAtividade',
+        referenceId: work.id,
+      });
+    } catch (error) {
+      throw new BadRequestException(`Falha ao criar tarefa: ${error.message}`);
+    }
+  }
+
+  async concludeTask(id: string): Promise<void> {
+    await this.database.execute(sql`
+      UPDATE tasks SET data_finalizacao = CURRENT_DATE WHERE id = ${id}
+  `);
   }
 
   async getTasks(id_tcc: string): Promise<TaskDTO[]> {

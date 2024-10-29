@@ -5,6 +5,7 @@ import {
   Param,
   Post,
   Put,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { ZodValidationPipe } from 'src/core/pipes/zod-validation.pipe';
@@ -36,8 +37,10 @@ export class TccGuidancesController {
   async findGuidances(
     @Param('id') id: string,
     @Param('type') type: 'aluno' | 'orientador',
+    @Query('name') name?: string,
+    @Query('status') status?: 'refused' | 'pending' | 'accepted',
   ) {
-    return await this.tccGuidancesService.findGuidances(id, type);
+    return await this.tccGuidancesService.findGuidances(id, type, name, status);
   }
 
   @Put('respondToGuidanceRequest/:id')

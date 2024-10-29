@@ -5,6 +5,7 @@ import { Helmet } from 'react-helmet-async'
 import { useNavigate, useParams } from 'react-router-dom'
 
 import { getTopics } from '@/api/get-task-topics'
+import { CreateTaskTopicDialog } from '@/components/create-task-topic-dialog'
 import { Button } from '@/components/ui/button'
 import {
   Card,
@@ -13,6 +14,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
+import { Dialog, DialogTrigger } from '@/components/ui/dialog'
 import { Sheet, SheetTrigger } from '@/components/ui/sheet'
 import { useAuth } from '@/hooks/useAuth'
 
@@ -57,14 +59,20 @@ export function TaskTopics() {
         <h3 className="text-2xl font-semibold leading-none tracking-tight">
           Tópicos
         </h3>
+        <Dialog>
+          <DialogTrigger asChild>
+            <Button
+              type="button"
+              disabled={
+                user?.tipo_pessoa === '842b617d-0558-4d48-89bc-a1b53f1c3c87'
+              }
+            >
+              Cadastrar
+            </Button>
+          </DialogTrigger>
 
-        <Button
-          disabled={
-            user?.tipo_pessoa === '842b617d-0558-4d48-89bc-a1b53f1c3c87'
-          }
-        >
-          Cadastrar
-        </Button>
+          <CreateTaskTopicDialog id_task={idTask!} />
+        </Dialog>
       </div>
       {isLoadingTaskTopics ? (
         <>

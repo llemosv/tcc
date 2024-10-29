@@ -122,3 +122,28 @@ export const topicFiles = pgTable('topic_files', {
     .notNull()
     .defaultNow(),
 });
+
+export const notificationType = pgTable('notification_type', {
+  id: uuid('id')
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  tipo: varchar('tipo', { length: 100 }).notNull(),
+});
+
+export const notification = pgTable('notification', {
+  id: uuid('id')
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  id_tipo_notificacao: uuid('id_tipo_notificacao')
+    .notNull()
+    .references(() => notificationType.id),
+  id_usuario_remetente: uuid('id_usuario_remetente')
+    .notNull()
+    .references(() => people.id),
+  id_usuario_destinatario: uuid('id_usuario_destinatario')
+    .notNull()
+    .references(() => people.id),
+  mensagem: varchar('mensagem', { length: 254 }).notNull(),
+  lida: boolean('lida').notNull().default(false),
+  id_referencia: uuid('id_referencia').notNull(),
+});

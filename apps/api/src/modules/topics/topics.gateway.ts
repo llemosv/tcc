@@ -1,7 +1,7 @@
 import {
-  SubscribeMessage,
   WebSocketGateway,
   WebSocketServer,
+  SubscribeMessage,
   OnGatewayConnection,
   OnGatewayDisconnect,
 } from '@nestjs/websockets';
@@ -9,12 +9,16 @@ import { Server, Socket } from 'socket.io';
 import { CreateTopicMessageDTO } from './dtos/create-topic-message.dto';
 import { TopicsService } from './topics.service';
 
-@WebSocketGateway({ cors: true })
+@WebSocketGateway()
 export class TopicsGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
   server: Server;
 
   constructor(private readonly topicsService: TopicsService) {}
+
+  afterInit() {
+    console.log('WebSocket Notification Gateway initialized');
+  }
 
   handleConnection(client: Socket) {
     console.log(`Client connected: ${client.id}`);

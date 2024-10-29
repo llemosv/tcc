@@ -42,6 +42,7 @@ import {
 } from '@/components/ui/tooltip'
 import { useAuth } from '@/hooks/useAuth'
 import { cn } from '@/lib/utils'
+import { getUserType } from '@/utils/get-user-type'
 
 import { getGuidances, Guidance } from '../../../../api/get-guidances'
 import { CardSkeleton } from '../partials/card-skeleton'
@@ -66,13 +67,14 @@ const chartConfig = {
 
 export function StudentDashboard() {
   const navigate = useNavigate()
+  const userType = getUserType()
   const { user } = useAuth()
 
   const [activeId, setActiveId] = useState<string | null>(null)
 
   const { data: tccGuidances, isLoading: isLoadingGuidances } = useQuery({
     queryKey: ['works'],
-    queryFn: () => getGuidances(user!.id, 'aluno'),
+    queryFn: () => getGuidances({ studentId: user!.id, type: userType }),
   })
 
   useEffect(() => {
@@ -138,7 +140,7 @@ export function StudentDashboard() {
       ) : (
         <Card>
           <CardHeader>
-            <CardTitle>Trabalhos em Andamento</CardTitle>
+            <CardTitle>Trabalhos</CardTitle>
             <CardDescription> Visualize os seus trabalhos</CardDescription>
           </CardHeader>
           <CardContent className="flex">
@@ -217,9 +219,9 @@ export function StudentDashboard() {
       ) : (
         <Card>
           <CardHeader>
-            <CardTitle>Tarefas Pendentes</CardTitle>
+            <CardTitle>Atividades Pendentes</CardTitle>
             <CardDescription>
-              Visualize as suas tarefas pendentes
+              Visualize as suas atividades pendentes
             </CardDescription>
           </CardHeader>
           <CardContent>

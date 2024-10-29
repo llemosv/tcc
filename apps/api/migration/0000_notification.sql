@@ -5,6 +5,21 @@ CREATE TABLE IF NOT EXISTS "courses" (
 	"semesters" integer NOT NULL
 );
 --> statement-breakpoint
+CREATE TABLE IF NOT EXISTS "notification" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"id_tipo_notificacao" uuid NOT NULL,
+	"id_usuario_remetente" uuid NOT NULL,
+	"id_usuario_destinatario" uuid NOT NULL,
+	"mensagem" varchar(254) NOT NULL,
+	"lida" boolean DEFAULT false NOT NULL,
+	"id_referencia" uuid NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE IF NOT EXISTS "notification_type" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"tipo" varchar(100) NOT NULL
+);
+--> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "people" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"nome" text,
@@ -61,7 +76,7 @@ CREATE TABLE IF NOT EXISTS "topic_files" (
 	"id_topic_messages" uuid NOT NULL,
 	"nome_arquivo" varchar(255) NOT NULL,
 	"caminho" text NOT NULL,
-	"data_upload" date NOT NULL
+	"data_upload" timestamp DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "topic_messages" (
@@ -69,8 +84,26 @@ CREATE TABLE IF NOT EXISTS "topic_messages" (
 	"id_topic" uuid NOT NULL,
 	"id_autor" uuid NOT NULL,
 	"conteudo" text NOT NULL,
-	"data_criacao" date NOT NULL
+	"data_criacao" timestamp DEFAULT now() NOT NULL
 );
+--> statement-breakpoint
+DO $$ BEGIN
+ ALTER TABLE "notification" ADD CONSTRAINT "notification_id_tipo_notificacao_notification_type_id_fk" FOREIGN KEY ("id_tipo_notificacao") REFERENCES "public"."notification_type"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+ ALTER TABLE "notification" ADD CONSTRAINT "notification_id_usuario_remetente_people_id_fk" FOREIGN KEY ("id_usuario_remetente") REFERENCES "public"."people"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+ ALTER TABLE "notification" ADD CONSTRAINT "notification_id_usuario_destinatario_people_id_fk" FOREIGN KEY ("id_usuario_destinatario") REFERENCES "public"."people"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
 --> statement-breakpoint
 DO $$ BEGIN
  ALTER TABLE "people" ADD CONSTRAINT "people_id_tipo_pessoa_people_types_id_fk" FOREIGN KEY ("id_tipo_pessoa") REFERENCES "public"."people_types"("id") ON DELETE no action ON UPDATE no action;
