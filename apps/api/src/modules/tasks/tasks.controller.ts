@@ -5,6 +5,7 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { ZodValidationPipe } from 'src/core/pipes/zod-validation.pipe';
@@ -32,8 +33,12 @@ export class TasksController {
   }
 
   @Get(':id')
-  async getTasks(@Param('id') id: string) {
-    return await this.tasksService.getTasks(id);
+  async getTasks(
+    @Param('id') id: string,
+    @Query('taskName') taskName?: string,
+    @Query('status') status?: 'concluded' | 'delayed' | 'pending',
+  ) {
+    return await this.tasksService.getTasks(id, taskName, status);
   }
 
   @Get('pending/:id')

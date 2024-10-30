@@ -8,8 +8,23 @@ export interface Task {
   data_finalizacao: string
 }
 
-export async function getTasks(idTask: string): Promise<Task[]> {
-  const response = await api.get<Task[]>(`/tasks/${idTask}`)
+interface GetTasks {
+  idTask: string
+  taskName?: string | null
+  status?: string | null
+}
+
+export async function getTasks({
+  idTask,
+  taskName = null,
+  status = null,
+}: GetTasks): Promise<Task[]> {
+  const response = await api.get<Task[]>(`/tasks/${idTask}`, {
+    params: {
+      taskName,
+      status,
+    },
+  })
 
   return response.data
 }

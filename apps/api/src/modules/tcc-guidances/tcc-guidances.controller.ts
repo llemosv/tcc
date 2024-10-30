@@ -42,6 +42,10 @@ export class TccGuidancesController {
   ) {
     return await this.tccGuidancesService.findGuidances(id, type, name, status);
   }
+  @Get('findPendingGuidances/:id')
+  async findPendingGuidances(@Param('id') id: string) {
+    return await this.tccGuidancesService.findPendingGuidances(id);
+  }
 
   @Put('respondToGuidanceRequest/:id')
   async respondToGuidanceRequest(

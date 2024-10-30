@@ -96,7 +96,10 @@ export function StudentDashboard() {
 
   const { data: tasksCalendar, isLoading: isLoadingTasksCalendar } = useQuery({
     queryKey: ['tasks', activeId],
-    queryFn: () => getTasks(activeId!),
+    queryFn: () =>
+      getTasks({
+        idTask: activeId!,
+      }),
     enabled: !!activeId,
     select: (data) => {
       return data.map((task) => {

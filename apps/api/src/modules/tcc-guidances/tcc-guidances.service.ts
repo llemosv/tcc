@@ -43,7 +43,7 @@ export class TccGuidancesService {
   ): Promise<any> {
     const alunoPeople = alias(schema.people, 'aluno');
     const orientadorPeople = alias(schema.people, 'orientador');
-    console.log(type);
+
     const conditions = [
       type === 'aluno'
         ? eq(schema.tccGuidances.id_aluno_solicitante, id)
@@ -138,72 +138,56 @@ export class TccGuidancesService {
     }
   }
 
-  // async getSolicitations(id: string, solicitacao_aceita: string): Promise<any> {
-  //   const solicitations = await this.solicitationModel
-  //     .find({
-  //       $and: [
-  //         { solicitacao_aceita },
-  //         {
-  //           $or: [
-  //             { data_reprovacao: { $exists: false } },
-  //             { data_reprovacao: null },
-  //           ],
-  //         },
-  //         {
-  //           $or: [
-  //             { id_aluno_solicitante: id },
-  //             { id_professor_orientador: id },
-  //           ],
-  //         },
-  //       ],
-  //     })
-  //     .populate('id_aluno_solicitante', 'nome')
-  //     .populate('id_professor_orientador', 'nome')
-  //     .select('nome_projeto descricao')
-  //     .exec();
+  async findPendingGuidances(id: string): Promise<any> {
+    const alunoPeople = alias(schema.people, 'aluno');
+    const orientadorPeople = alias(schema.people, 'orientador');
 
-  //   if (solicitations.length === 0) {
-  //     this.logger.warn('NENHUMA SOLICITAÇÃO ENCONTRADA!');
+    const query = this.database
+      .select({
+        id_orientacao: schema.tccGuidances.id,
+        aluno: alunoPeople.nome,
+        orientador: orientadorPeople.nome,
+        tema: schema.tccGuidances.tema,
+        previsao_entrega: sql<string>`TO_CHAR(${schema.tccGuidances.previsao_entrega}, 'DD/MM/YYYY')`,
+        solicitacao_aceita: schema.tccGuidances.solicitacao_aceita,
+        data_aprovacao: sql<string>`TO_CHAR(${schema.tccGuidances.data_aprovacao}, 'DD/MM/YYYY')`,
+        data_reprovacao: sql<string>`TO_CHAR(${schema.tccGuidances.data_reprovacao}, 'DD/MM/YYYY')`,
+        justificativa_reprovacao: schema.tccGuidances.justificativaReprovacao,
+        total_atividades: sql<number>`COUNT(${schema.tasks.id})`,
+      })
+      .from(schema.tccGuidances)
+      .innerJoin(
+        alunoPeople,
+        eq(alunoPeople.id, schema.tccGuidances.id_aluno_solicitante),
+      )
+      .innerJoin(
+        orientadorPeople,
+        eq(orientadorPeople.id, schema.tccGuidances.id_professor_orientador),
+      )
+      .leftJoin(
+        // Adicionando o JOIN com a tabela tasks
+        schema.tasks,
+        eq(schema.tasks.id_tcc, schema.tccGuidances.id), // Ajuste conforme sua lógica de relacionamento
+      )
+      .where(
+        and(
+          eq(schema.tccGuidances.solicitacao_aceita, false),
+          isNull(schema.tccGuidances.data_reprovacao),
+          eq(schema.tccGuidances.id_professor_orientador, id),
+        ),
+      )
+      .groupBy(
+        schema.tccGuidances.id,
+        alunoPeople.nome,
+        orientadorPeople.nome,
+        schema.tccGuidances.tema,
+        schema.tccGuidances.previsao_entrega,
+        schema.tccGuidances.solicitacao_aceita,
+        schema.tccGuidances.data_aprovacao,
+        schema.tccGuidances.data_reprovacao,
+        schema.tccGuidances.justificativaReprovacao,
+      );
 
-  //     throw new NotFoundException('Nenhuma solicitação encontrada!');
-  //   }
-
-  //   const formattedData = solicitations.map((solicitation: any) => ({
-  //     id: solicitation._id,
-  //     nome: solicitation.id_aluno_solicitante.nome,
-  //     orientador: solicitation.id_professor_orientador.nome,
-  //     descricao: `Tema: ${solicitation.nome_projeto}`,
-  //     message: solicitation.descricao,
-  //   }));
-
-  //   this.logger.log('SOLICITAÇÕES BUSCADAS COM SUCESSO!');
-
-  //   return formattedData;
-  // }
-
-  // async acceptSolicitation(id: string, accept: boolean): Promise<any> {
-  //   const solicitationExists = await this.solicitationModel
-  //     .findOne({ _id: id })
-  //     .exec();
-
-  //   if (!solicitationExists) {
-  //     throw new NotFoundException(`Solicitação não encontrada!`);
-  //   }
-
-  //   if (accept) {
-  //     return await this.solicitationModel
-  //       .findOneAndUpdate(
-  //         { _id: id },
-  //         { $set: { solicitacao_aceita: true, data_aprovacao: new Date() } },
-  //       )
-  //       .exec();
-  //   } else {
-  //     return await this.solicitationModel
-  //       .findOneAndUpdate(
-  //         { _id: id },
-  //         { $set: { solicitacao_aceita: false, data_reprovacao: new Date() } },
-  //       )
-  //       .exec();
-  //   }
-  // }
+    return await query;
+  }
 }

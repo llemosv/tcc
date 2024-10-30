@@ -26,7 +26,7 @@ export function TeacherWorks() {
 
   const name = searchParams.get('name')
   const status = searchParams.get('status')
-  console.log(name)
+
   const { data: works, isLoading: isLoadingGuidances } = useQuery({
     queryKey: ['works', user!.id, userType, name, status],
     queryFn: () =>

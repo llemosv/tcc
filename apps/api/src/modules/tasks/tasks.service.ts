@@ -10,7 +10,7 @@ import {
 import { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 import { DRIZZLE_ORM } from 'src/core/constrants/db.constants';
 import { TaskDTO } from './dtos/create-task.dto';
-import { eq, sql } from 'drizzle-orm';
+import { and, eq, gte, isNotNull, isNull, like, lt, sql } from 'drizzle-orm';
 import { TasksCount } from './dtos/tasks.count.dto';
 import { NotificationsService } from '../notifications/notifications.service';
 
@@ -60,19 +60,52 @@ export class TasksService {
   `);
   }
 
-  async getTasks(id_tcc: string): Promise<TaskDTO[]> {
-    const response = await this.database.execute(sql`
-      select tasks.id, 
-             tasks.tarefa, 
-             TO_CHAR(tasks.data_criacao, 'DD/MM/YYYY') as data_criacao, 
-             TO_CHAR(tasks.previsao_entrega, 'DD/MM/YYYY') as previsao_entrega,
-             TO_CHAR(tasks.data_finalizacao, 'DD/MM/YYYY') as data_finalizacao
-      from tasks 
-      where id_tcc = ${id_tcc}
-      order by data_criacao
-      `);
+  async getTasks(
+    id_tcc: string,
+    taskName?: string,
+    status?: 'concluded' | 'delayed' | 'pending',
+  ): Promise<TaskDTO[]> {
+    const conditions = []; // Cria um array para armazenar as condições
 
-    return response;
+    // Verifica se taskName foi fornecido e adiciona a condição
+    if (taskName) {
+      conditions.push(like(schema.tasks.tarefa, `%${taskName}%`));
+    }
+
+    // Verifica o status e adiciona as condições apropriadas
+    if (status) {
+      switch (status) {
+        case 'concluded':
+          conditions.push(isNotNull(schema.tasks.data_finalizacao));
+          break;
+        case 'delayed':
+          conditions.push(
+            isNull(schema.tasks.data_finalizacao),
+            lt(schema.tasks.previsao_entrega, sql`NOW()`),
+          );
+          break;
+        case 'pending':
+          conditions.push(
+            isNull(schema.tasks.data_finalizacao),
+            gte(schema.tasks.previsao_entrega, sql`NOW()`),
+          );
+          break;
+      }
+    }
+
+    // Construção da consulta
+    const query = await this.database
+      .select({
+        id: schema.tasks.id,
+        tarefa: schema.tasks.tarefa,
+        data_criacao: sql`TO_CHAR(${schema.tasks.data_criacao}, 'DD/MM/YYYY')`,
+        previsao_entrega: sql`TO_CHAR(${schema.tasks.previsao_entrega}, 'DD/MM/YYYY')`,
+        data_finalizacao: sql`TO_CHAR(${schema.tasks.data_finalizacao}, 'DD/MM/YYYY')`,
+      })
+      .from(schema.tasks)
+      .where(and(eq(schema.tasks.id_tcc, id_tcc), ...conditions)); // Espalha as condições
+
+    return query as TaskDTO[]; // Retorna o resultado da consulta
   }
 
   async getPendingTasks(id_tcc: number): Promise<TaskDTO[]> {
