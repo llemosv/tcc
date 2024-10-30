@@ -4,13 +4,12 @@ import { Controller, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { z } from 'zod'
 
-import { concludeTask } from '@/api/conclude-task'
+import { concludeTaskTopic } from '@/api/conclude-task-topic'
 
 import { Button } from './ui/button'
 import {
   DialogClose,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -19,35 +18,29 @@ import { Label } from './ui/label'
 import { Switch } from './ui/switch'
 import { Textarea } from './ui/textarea'
 
-interface ConcludeTaskDialogProps {
+interface ConcludeTaskTopicDialogProps {
   id: string
 }
 
-const concludeTaskSchema = z.object({
+const concludeTaskTopicSchema = z.object({
   accept: z.boolean().default(false),
   justification: z.string(),
 })
 
-type ConcludeTaskSchema = z.infer<typeof concludeTaskSchema>
+type ConcludeTaskTopicSchema = z.infer<typeof concludeTaskTopicSchema>
 
-export function ConcludeTaskDialog({ id }: ConcludeTaskDialogProps) {
+export function ConcludeTaskTopicDialog({ id }: ConcludeTaskTopicDialogProps) {
   const queryClient = useQueryClient()
 
-  const {
-    handleSubmit,
-    register,
-    control,
-    reset,
-    formState: { isValid },
-  } = useForm<ConcludeTaskSchema>({
-    resolver: zodResolver(concludeTaskSchema),
+  const { handleSubmit, register, control } = useForm<ConcludeTaskTopicSchema>({
+    resolver: zodResolver(concludeTaskTopicSchema),
     defaultValues: {
       justification: '',
     },
   })
 
-  const { mutateAsync: conclude, isPending } = useMutation({
-    mutationFn: concludeTask,
+  const { mutateAsync: concludeTopic, isPending } = useMutation({
+    mutationFn: concludeTaskTopic,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tasks'] })
       toast.success('Atividade atualizada com sucesso.')
@@ -57,8 +50,8 @@ export function ConcludeTaskDialog({ id }: ConcludeTaskDialogProps) {
     },
   })
 
-  async function handleConcludeTask(data: ConcludeTaskSchema) {
-    await conclude({
+  async function handleConcludeTaskTopic(data: ConcludeTaskTopicSchema) {
+    await concludeTopic({
       id,
       conclude: data.accept,
       justification: data.justification,
@@ -69,16 +62,13 @@ export function ConcludeTaskDialog({ id }: ConcludeTaskDialogProps) {
     <DialogContent>
       <DialogHeader>
         <DialogTitle>Finalizar atividade</DialogTitle>
-        {/* <DialogDescription>
-          Deseja confirmar a conclusão da atividade selecionada?
-        </DialogDescription> */}
       </DialogHeader>
 
-      <form onSubmit={handleSubmit(handleConcludeTask)}>
+      <form onSubmit={handleSubmit(handleConcludeTaskTopic)}>
         <div className="space-y-5 pb-4 pt-2">
           <div className="grid space-y-2">
             <Label htmlFor="accept">
-              Deseja confirmar a conclusão da atividade selecionada?
+              Deseja confirmar a conclusão do tópico selecionado?
             </Label>
             <Controller
               control={control}

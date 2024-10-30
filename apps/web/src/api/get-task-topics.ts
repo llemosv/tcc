@@ -8,6 +8,8 @@ export interface Topics {
   data_criacao: string
   previsao_entrega: string
   data_finalizacao: string | null
+  justificativa: string | null
+  data_pendente_revisao: string | null
 }
 
 export async function getTopics(idTask: string): Promise<Topics[]> {

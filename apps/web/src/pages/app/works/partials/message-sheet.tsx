@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { Paperclip } from 'lucide-react'
-import { useLayoutEffect, useRef } from 'react'
+import { useEffect, useRef } from 'react'
 import { useForm } from 'react-hook-form'
 import { io } from 'socket.io-client'
 import { z } from 'zod'
@@ -55,7 +55,7 @@ export function MessageSheet({ topic, idTopic }: MessageSheetProps) {
     resolver: zodResolver(sendMessageSchema),
   })
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     socket.emit('joinTopic', idTopic)
 
     socket.on('receiveMessage', (newMessage: TopicMessage) => {
@@ -73,7 +73,7 @@ export function MessageSheet({ topic, idTopic }: MessageSheetProps) {
     }
   }, [idTopic, queryClient])
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollIntoView({ behavior: 'smooth' })
     }

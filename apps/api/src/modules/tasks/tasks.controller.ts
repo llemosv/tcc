@@ -12,6 +12,7 @@ import { ZodValidationPipe } from 'src/core/pipes/zod-validation.pipe';
 import { TasksService } from './tasks.service';
 import { TaskDTO, createTaskSchema } from './dtos/create-task.dto';
 import { AuthGuard } from '../auth/auth.guard';
+import { ConcludeTaskDTO } from './dtos/conclude-task.dto';
 
 @UseGuards(AuthGuard)
 @Controller('tasks')
@@ -27,9 +28,18 @@ export class TasksController {
   }
 
   @Patch(':id/conclude')
-  async concludeTask(@Param('id') id: string) {
-    console.log(id);
-    return await this.tasksService.concludeTask(id);
+  async concludeTask(
+    @Param('id') id: string,
+    @Body() concludeTaskDTO: ConcludeTaskDTO,
+  ) {
+    const { conclude, justification } = concludeTaskDTO;
+
+    return await this.tasksService.concludeTask(id, conclude, justification);
+  }
+
+  @Patch(':id/review')
+  async pendingReview(@Param('id') id: string) {
+    return await this.tasksService.pendingReview(id);
   }
 
   @Get(':id')

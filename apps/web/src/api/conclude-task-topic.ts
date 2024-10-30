@@ -6,12 +6,12 @@ export interface ConcludeTask {
   justification: string
 }
 
-export async function concludeTask({
+export async function concludeTaskTopic({
   id,
   conclude,
   justification,
 }: ConcludeTask): Promise<void> {
-  await api.patch(`tasks/${id}/conclude`, {
+  await api.patch(`topics/${id}/conclude`, {
     conclude,
     justification,
   })

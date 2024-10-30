@@ -3,16 +3,26 @@ import {
   BadRequestException,
   Inject,
   Injectable,
-  InternalServerErrorException,
   Logger,
   NotFoundException,
 } from '@nestjs/common';
 import { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 import { DRIZZLE_ORM } from 'src/core/constrants/db.constants';
 import { TaskDTO } from './dtos/create-task.dto';
-import { and, eq, gte, isNotNull, isNull, like, lt, sql } from 'drizzle-orm';
+import {
+  and,
+  eq,
+  gte,
+  isNotNull,
+  isNull,
+  like,
+  lt,
+  SQL,
+  sql,
+} from 'drizzle-orm';
 import { TasksCount } from './dtos/tasks.count.dto';
 import { NotificationsService } from '../notifications/notifications.service';
+import { format } from 'date-fns';
 
 @Injectable()
 export class TasksService {
@@ -54,9 +64,42 @@ export class TasksService {
     }
   }
 
-  async concludeTask(id: string): Promise<void> {
+  async pendingReview(id: string): Promise<void> {
+    const validateTopics = await this.database
+      .select()
+      .from(schema.taskTopics)
+      .where(
+        and(
+          eq(schema.taskTopics.id_task, id),
+          isNull(schema.taskTopics.data_finalizacao),
+        ),
+      );
+
+    if (validateTopics.length > 0)
+      throw new BadRequestException(
+        'Para solicitar uma revisão da atividade é necessário que todos os tópicos estejam concluídos.',
+      );
+
     await this.database.execute(sql`
-      UPDATE tasks SET data_finalizacao = CURRENT_DATE WHERE id = ${id}
+      UPDATE tasks SET data_pendente_revisao = CURRENT_DATE WHERE id = ${id}
+  `);
+  }
+
+  async concludeTask(
+    id: string,
+    conclude: boolean,
+    justification?: string,
+  ): Promise<void> {
+    await this.database.execute(sql`
+      UPDATE tasks 
+      SET 
+          ${
+            conclude
+              ? sql`data_finalizacao = CURRENT_DATE,`
+              : sql`data_pendente_revisao = NULL,`
+          }
+          justificativa = ${justification}
+      WHERE id = ${id}
   `);
   }
 
@@ -64,15 +107,23 @@ export class TasksService {
     id_tcc: string,
     taskName?: string,
     status?: 'concluded' | 'delayed' | 'pending',
-  ): Promise<TaskDTO[]> {
-    const conditions = []; // Cria um array para armazenar as condições
+  ): Promise<
+    {
+      id: string;
+      id_tcc: string;
+      tarefa: string;
+      data_criacao: unknown;
+      previsao_entrega: unknown;
+      data_pendente_revisao: unknown;
+      data_finalizacao: unknown;
+    }[]
+  > {
+    const conditions: SQL[] = [];
 
-    // Verifica se taskName foi fornecido e adiciona a condição
     if (taskName) {
       conditions.push(like(schema.tasks.tarefa, `%${taskName}%`));
     }
 
-    // Verifica o status e adiciona as condições apropriadas
     if (status) {
       switch (status) {
         case 'concluded':
@@ -93,23 +144,25 @@ export class TasksService {
       }
     }
 
-    // Construção da consulta
     const query = await this.database
       .select({
         id: schema.tasks.id,
+        id_tcc: schema.tasks.id_tcc,
         tarefa: schema.tasks.tarefa,
         data_criacao: sql`TO_CHAR(${schema.tasks.data_criacao}, 'DD/MM/YYYY')`,
         previsao_entrega: sql`TO_CHAR(${schema.tasks.previsao_entrega}, 'DD/MM/YYYY')`,
+        data_pendente_revisao: sql`TO_CHAR(${schema.tasks.data_pendente_revisao}, 'DD/MM/YYYY')`,
         data_finalizacao: sql`TO_CHAR(${schema.tasks.data_finalizacao}, 'DD/MM/YYYY')`,
+        justificativa: schema.tasks.justificativa,
       })
       .from(schema.tasks)
-      .where(and(eq(schema.tasks.id_tcc, id_tcc), ...conditions)); // Espalha as condições
+      .where(and(eq(schema.tasks.id_tcc, id_tcc), ...conditions));
 
-    return query as TaskDTO[]; // Retorna o resultado da consulta
+    return query;
   }
 
   async getPendingTasks(id_tcc: number): Promise<TaskDTO[]> {
-    const response = await this.database.execute(sql`
+    const response = (await this.database.execute(sql`
       SELECT tasks.id, 
             tasks.tarefa, 
             TO_CHAR(tasks.data_criacao, 'DD/MM/YYYY') AS data_criacao, 
@@ -120,7 +173,7 @@ export class TasksService {
             AND data_finalizacao IS NULL
       ORDER BY tasks.previsao_entrega;
 
-      `);
+      `)) as TaskDTO[];
 
     return response;
   }

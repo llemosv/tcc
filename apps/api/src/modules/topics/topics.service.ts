@@ -6,10 +6,7 @@ import { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 import { DRIZZLE_ORM } from 'src/core/constrants/db.constants';
 import { eq, sql } from 'drizzle-orm';
 import { CreateTopicDTO, TopicDTO } from './dtos/create-topic.dto';
-import {
-  CreateTopicMessageDTO,
-  CreateTopicMessageResponse,
-} from './dtos/create-topic-message.dto';
+import { CreateTopicMessageDTO } from './dtos/create-topic-message.dto';
 import { TopicMessageDTO } from './dtos/topic-message.dto';
 
 @Injectable()
@@ -37,7 +34,9 @@ export class TopicsService {
              descricao,
              TO_CHAR(task_topics.data_criacao, 'DD/MM/YYYY') as data_criacao, 
              TO_CHAR(task_topics.previsao_entrega, 'DD/MM/YYYY') as previsao_entrega,
-             TO_CHAR(task_topics.data_finalizacao, 'DD/MM/YYYY') as data_finalizacao
+             TO_CHAR(task_topics.data_finalizacao, 'DD/MM/YYYY') as data_finalizacao,
+             TO_CHAR(task_topics.data_pendente_revisao, 'DD/MM/YYYY') as data_pendente_revisao,
+             justificativa
       from task_topics
       where id_task = ${id_task}
       `);
@@ -101,5 +100,35 @@ export class TopicsService {
       `);
 
     return response;
+  }
+
+  async delete(id: string): Promise<void> {
+    await this.database
+      .delete(schema.taskTopics)
+      .where(eq(schema.taskTopics.id, id));
+  }
+
+  async pendingReview(id: string): Promise<void> {
+    await this.database.execute(sql`
+      UPDATE task_topics SET data_pendente_revisao = CURRENT_DATE WHERE id = ${id}
+  `);
+  }
+
+  async concludeTask(
+    id: string,
+    conclude: boolean,
+    justification?: string,
+  ): Promise<void> {
+    await this.database.execute(sql`
+      UPDATE task_topics 
+      SET 
+          ${
+            conclude
+              ? sql`data_finalizacao = CURRENT_DATE,`
+              : sql`data_pendente_revisao = NULL,`
+          }
+          justificativa = ${justification}
+      WHERE id = ${id}
+  `);
   }
 }

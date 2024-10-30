@@ -76,6 +76,8 @@ export const tasks = pgTable('tasks', {
   tarefa: varchar('tarefa', { length: 255 }).notNull(),
   data_criacao: date('data_criacao').notNull(),
   previsao_entrega: date('previsao_entrega').notNull(),
+  data_pendente_revisao: date('data_pendente_revisao'),
+  justificativa: text('justificativa'),
   data_finalizacao: date('data_finalizacao'),
 });
 
@@ -90,6 +92,8 @@ export const taskTopics = pgTable('task_topics', {
   descricao: text('descricao').notNull(),
   data_criacao: date('data_criacao').notNull(),
   previsao_entrega: date('previsao_entrega').notNull(),
+  data_pendente_revisao: date('data_pendente_revisao'),
+  justificativa: text('justificativa'),
   data_finalizacao: date('data_finalizacao'),
 });
 
