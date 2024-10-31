@@ -6,6 +6,8 @@ export interface Task {
   data_criacao: string
   previsao_entrega: string
   data_finalizacao: string
+  data_pendente_revisao: string
+  justificativa: string | null
 }
 
 export async function getPendingTasks(idTrabalho: string): Promise<Task[]> {

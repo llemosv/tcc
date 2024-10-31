@@ -4,7 +4,6 @@ import { Link } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 
 import { getTasksPendingApproval } from '@/api/get-tasks-pending-approval'
-import { AcceptSolicitationDialog } from '@/components/accept-solicitation-dialog'
 import {
   Card,
   CardContent,
@@ -29,7 +28,6 @@ import {
 } from '@/components/ui/tooltip'
 import { useAuth } from '@/hooks/useAuth'
 import { cn } from '@/lib/utils'
-import { getColor } from '@/utils/get-color'
 
 import { CardSkeleton } from '../card-skeleton'
 
@@ -88,8 +86,8 @@ export function TasksPendingApprovalCard() {
                             ),
                             actualDate,
                           )
-                            ? 'text-red-600' // Vermelho se a previsão for anterior à data atual
-                            : 'text-yellow-500', // Amarelo caso contrário
+                            ? 'text-red-600'
+                            : 'text-yellow-500',
                         )}
                       >
                         {task.previsao_entrega}

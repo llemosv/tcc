@@ -22,8 +22,6 @@ import {
 } from 'drizzle-orm';
 import { TasksCount } from './dtos/tasks.count.dto';
 import { NotificationsService } from '../notifications/notifications.service';
-import { format } from 'date-fns';
-import { Scheduler } from 'rxjs';
 import { TasksPendingApproval } from './dtos/tasks-pending-approval.dto';
 
 @Injectable()

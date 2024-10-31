@@ -31,7 +31,7 @@ import { TasksFilters } from './tasks-table-filters'
 
 export function TasksTable() {
   const navigate = useNavigate()
-  const [searchParams, setSearchParams] = useSearchParams()
+  const [searchParams, _] = useSearchParams()
   const { id } = useParams<{ id: string }>()
 
   const task = searchParams.get('task')

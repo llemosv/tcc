@@ -134,7 +134,7 @@ export function MessageSheet({ topic, idTopic }: MessageSheetProps) {
           onSubmit={handleSubmit(handleSendMessage)}
           className="flex w-full items-center gap-4"
         >
-          <Input {...register('conteudo')} />
+          <Input {...register('conteudo')} autoComplete="off" />
           <button className="flex  text-muted-foreground transition-colors hover:text-foreground">
             <TooltipProvider>
               <Tooltip>

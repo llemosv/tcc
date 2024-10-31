@@ -10,7 +10,6 @@ import { Button } from './ui/button'
 import {
   DialogClose,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -33,13 +32,7 @@ type ConcludeTaskSchema = z.infer<typeof concludeTaskSchema>
 export function ConcludeTaskDialog({ id }: ConcludeTaskDialogProps) {
   const queryClient = useQueryClient()
 
-  const {
-    handleSubmit,
-    register,
-    control,
-    reset,
-    formState: { isValid },
-  } = useForm<ConcludeTaskSchema>({
+  const { handleSubmit, register, control } = useForm<ConcludeTaskSchema>({
     resolver: zodResolver(concludeTaskSchema),
     defaultValues: {
       justification: '',

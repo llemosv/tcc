@@ -14,14 +14,14 @@ import { useAuth } from '@/hooks/useAuth'
 import { cn } from '@/lib/utils'
 import { getUserType } from '@/utils/get-user-type'
 
-import { getGuidances, Guidance } from '../../../../api/get-guidances'
+import { getGuidances } from '../../../../api/get-guidances'
 import { CardSkeleton } from '../partials/card-skeleton'
 import { WorkFilters } from '../partials/works-filters'
 
 export function TeacherWorks() {
   const userType = getUserType()
   const navigate = useNavigate()
-  const [searchParams, setSearchParams] = useSearchParams()
+  const [searchParams, _] = useSearchParams()
   const { user } = useAuth()
 
   const name = searchParams.get('name')
@@ -40,14 +40,6 @@ export function TeacherWorks() {
 
   function handleViewProjects(id: number | string) {
     navigate(`/works/${id}`)
-  }
-
-  function validateSolicitation(works: Guidance[]): boolean {
-    return works.some(
-      (work) =>
-        work.solicitacao_aceita === true ||
-        (!work.solicitacao_aceita && !work.data_reprovacao),
-    )
   }
 
   return (
