@@ -31,8 +31,11 @@
       ]
     },
 
-    
-    "lint": {}
+    "start": {
+      "dependsOn": [
+        "^build"
+      ]
+    }
     
   }
 }
