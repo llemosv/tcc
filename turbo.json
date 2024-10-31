@@ -1,9 +1,26 @@
 {
   "$schema": "https://turbo.build/schema.json",
   "tasks": {
+    "dev": {
+      "cache": false,
+      "persistent": true,
+      "env": [
+        ".env.development.local",
+        ".env.development",
+        ".env.local",
+        ".env"
+      ]
+    },
+
     "build": {
       "dependsOn": [
         "^build"
+      ],
+      "env": [
+        ".env.production.local",
+        ".env.production",
+        ".env.local",
+        ".env"
       ],
       "inputs": [
         "$TURBO_DEFAULT$",
@@ -13,10 +30,9 @@
         "dist/**"
       ]
     },
-    "lint": {},
-    "dev": {
-      "cache": false,
-      "persistent": true
-    }
+
+    
+    "lint": {}
+    
   }
 }

@@ -11,10 +11,16 @@ import { TccGuidancesModule } from './modules/tcc-guidances/tcc-guidances.module
 import { TasksModule } from './modules/tasks/tasks.module';
 import { TopicsModule } from './modules/topics/topics.module';
 import { NotificationsModule } from './modules/notifications/notifications.module';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'node:path';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', '..', 'web', 'dist'),
+      exclude: ['api/*'],
+    }),
     NestDrizzleModule.forRootAsync({
       useFactory: () => {
         return {
