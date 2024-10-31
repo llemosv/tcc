@@ -67,32 +67,8 @@ export function TaskTopicsCard() {
                 <div className="mb-1 flex items-center justify-between">
                   <CardTitle>{item.titulo}</CardTitle>
 
-                  <div className="flex items-center gap-1">
-                    {userType !== 'aluno' && (
-                      <TooltipProvider>
-                        <Tooltip>
-                          <TooltipTrigger>
-                            <Dialog>
-                              <DialogTrigger asChild>
-                                <button
-                                  type="button"
-                                  className="cursor-pointer hover:text-primary"
-                                >
-                                  <Trash className="h-5 w-5 hover:cursor-pointer hover:text-red-600" />
-                                </button>
-                              </DialogTrigger>
-
-                              <DeleteTaskTopicDialog id={item.id} />
-                            </Dialog>
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            <p>Excluir tópico</p>
-                          </TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
-                    )}
-
-                    {item.justificativa && (
+                  <div className="flex text-center justify-center gap-2">
+                  {item.justificativa && (
                       <TooltipProvider>
                         <Tooltip>
                           <TooltipTrigger>
@@ -113,6 +89,36 @@ export function TaskTopicsCard() {
                           </TooltipTrigger>
                           <TooltipContent>
                             <p>Justificativa</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    )}
+
+                    {userType !== 'aluno' && (
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger>
+                            <Dialog>
+                              <DialogTrigger asChild>
+                                <button
+                                  type="button"
+                                  className={cn(
+                                    !!item.data_finalizacao ||
+                                      !!item.data_pendente_revisao
+                                      ? 'cursor-not-allowed text-muted-foreground hover:text-muted-foreground'
+                                      : 'cursor-pointer hover:text-red-600'
+                                  )}
+                                  disabled={!!item.data_finalizacao}
+                                >
+                                  <Trash className="h-5 w-5" />
+                                </button>
+                              </DialogTrigger>
+
+                              <DeleteTaskTopicDialog id={item.id} />
+                            </Dialog>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>Excluir tópico</p>
                           </TooltipContent>
                         </Tooltip>
                       </TooltipProvider>

@@ -56,6 +56,11 @@ export class TasksController {
     return await this.tasksService.getPendingTasks(id);
   }
 
+  @Get('pendingApproval/:id_orientador')
+  async getTasksPendingApproval(@Param('id_orientador') id_orientador: string) {
+    return await this.tasksService.getTasksPendingApproval(id_orientador);
+  }
+
   @Get('count/:id')
   async getTasksCount(@Param('id') id: number) {
     return await this.tasksService.getTasksCount(id);

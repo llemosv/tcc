@@ -23,6 +23,8 @@ import {
 import { TasksCount } from './dtos/tasks.count.dto';
 import { NotificationsService } from '../notifications/notifications.service';
 import { format } from 'date-fns';
+import { Scheduler } from 'rxjs';
+import { TasksPendingApproval } from './dtos/tasks-pending-approval.dto';
 
 @Injectable()
 export class TasksService {
@@ -213,5 +215,36 @@ export class TasksService {
     ];
 
     return data;
+  }
+
+  async getTasksPendingApproval(
+    id_professor_orientador: string,
+  ): Promise<TasksPendingApproval[]> {
+    const tasks = await this.database
+      .select({
+        id: schema.tasks.id,
+        id_tcc: schema.tasks.id_tcc,
+        tarefa: schema.tasks.tarefa,
+        data_criacao: sql`TO_CHAR(${schema.tasks.data_criacao}, 'DD/MM/YYYY')`,
+        solicitacao_revisao: sql`TO_CHAR(${schema.tasks.data_pendente_revisao}, 'DD/MM/YYYY')`,
+        previsao_entrega: sql`TO_CHAR(${schema.tasks.previsao_entrega}, 'DD/MM/YYYY')`,
+      })
+      .from(schema.tasks)
+      .innerJoin(
+        schema.tccGuidances,
+        eq(schema.tccGuidances.id, schema.tasks.id_tcc),
+      )
+      .where(
+        and(
+          eq(
+            schema.tccGuidances.id_professor_orientador,
+            id_professor_orientador,
+          ),
+          isNull(schema.tasks.data_finalizacao),
+          isNotNull(schema.tasks.data_pendente_revisao),
+        ),
+      );
+
+    return tasks as TasksPendingApproval[];
   }
 }
