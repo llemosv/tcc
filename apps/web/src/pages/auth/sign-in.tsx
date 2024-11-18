@@ -2,6 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { AxiosError } from 'axios'
 import { Helmet } from 'react-helmet-async'
 import { useForm } from 'react-hook-form'
+import { useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
 import { z } from 'zod'
 
@@ -19,6 +20,7 @@ type SignInForm = z.infer<typeof signInForm>
 
 export function SignIn() {
   const { signIn } = useAuth()
+  const navigate = useNavigate()
 
   const {
     register,
@@ -42,6 +44,10 @@ export function SignIn() {
         toast.error('Erro ao acessar o painel')
       }
     }
+  }
+
+  async function handleResetPassword() {
+    navigate('/reset-password')
   }
 
   return (
@@ -70,6 +76,14 @@ export function SignIn() {
               <Label htmlFor="senha">Senha</Label>
               <Input id="senha" type="password" {...register('senha')} />
             </div>
+            <Button
+              type="button"
+              variant="link"
+              className="ml-auto h-6 p-1"
+              onClick={handleResetPassword}
+            >
+              Esqueci minha senha
+            </Button>
 
             <Button type="submit" disabled={!isValid || isSubmitting}>
               Acessar

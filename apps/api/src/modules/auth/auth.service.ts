@@ -12,6 +12,8 @@ import * as schema from 'src/shared/database/schema';
 import * as bcrypt from 'bcrypt';
 import { sql } from 'drizzle-orm';
 import { JwtService } from '@nestjs/jwt';
+import { ValidatePeopleDTO } from './dtos/validate-people.dto';
+import { UpdatePasswordDTO } from './dtos/update-password.dto';
 
 @Injectable()
 export class AuthService {
@@ -71,5 +73,30 @@ export class AuthService {
       user: people,
       token: await this.jwtService.signAsync(payload),
     };
+  }
+
+  async validatePeople(validatePeopleDTO: ValidatePeopleDTO): Promise<any> {
+    const { email, cpf } = validatePeopleDTO;
+
+    const peopleExists = await this.database.query.people.findMany({
+      where: (people, { and, eq }) =>
+        and(eq(people.email, email), eq(people.cpf, cpf)),
+    });
+    console.log(peopleExists);
+    if (peopleExists.length === 0) {
+      throw new BadRequestException(`Usuário não encontrado.`);
+    }
+
+    return true;
+  }
+
+  async updatePassword(updatePasswordDTO: UpdatePasswordDTO): Promise<void> {
+    const { email, cpf, ...props } = updatePasswordDTO;
+
+    props.password = bcrypt.hashSync(props.password, 10);
+
+    await this.database.execute(sql`
+      UPDATE usuario SET senha = ${props.password} WHERE email = ${email} and cpf = ${cpf}
+  `);
   }
 }
