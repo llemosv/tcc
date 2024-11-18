@@ -31,14 +31,14 @@ export class TopicsGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @SubscribeMessage('sendMessage')
   async handleMessage(_: Socket, payload: CreateTopicMessageDTO) {
     const response = await this.topicsService.createMessage({
-      id_topic: payload.id_topic,
+      id_topico: payload.id_topico,
       id_autor: payload.id_autor,
       conteudo: payload.conteudo,
     });
 
     const message = await this.topicsService.getMessageById(response.id);
 
-    this.server.to(payload.id_topic).emit('receiveMessage', message);
+    this.server.to(payload.id_topico).emit('receiveMessage', message);
   }
 
   @SubscribeMessage('joinTopic')

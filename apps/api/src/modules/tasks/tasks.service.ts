@@ -70,7 +70,7 @@ export class TasksService {
       .from(schema.taskTopics)
       .where(
         and(
-          eq(schema.taskTopics.id_task, id),
+          eq(schema.taskTopics.id_atividade, id),
           isNull(schema.taskTopics.data_finalizacao),
         ),
       );
@@ -81,7 +81,7 @@ export class TasksService {
       );
 
     await this.database.execute(sql`
-      UPDATE tasks SET data_pendente_revisao = CURRENT_DATE WHERE id = ${id}
+      UPDATE atividades SET data_pendente_revisao = CURRENT_DATE WHERE id = ${id}
   `);
   }
 
@@ -91,7 +91,7 @@ export class TasksService {
     justification?: string,
   ): Promise<void> {
     await this.database.execute(sql`
-      UPDATE tasks 
+      UPDATE atividades 
       SET 
           ${
             conclude
@@ -163,15 +163,15 @@ export class TasksService {
 
   async getPendingTasks(id_tcc: number): Promise<TaskDTO[]> {
     const response = (await this.database.execute(sql`
-      SELECT tasks.id, 
-            tasks.tarefa, 
-            TO_CHAR(tasks.data_criacao, 'DD/MM/YYYY') AS data_criacao, 
-            TO_CHAR(tasks.previsao_entrega, 'DD/MM/YYYY') AS previsao_entrega,
-            TO_CHAR(tasks.data_finalizacao, 'DD/MM/YYYY') AS data_finalizacao
-      FROM   tasks 
+      SELECT atividades.id, 
+            atividades.tarefa, 
+            TO_CHAR(atividades.data_criacao, 'DD/MM/YYYY') AS data_criacao, 
+            TO_CHAR(atividades.previsao_entrega, 'DD/MM/YYYY') AS previsao_entrega,
+            TO_CHAR(atividades.data_finalizacao, 'DD/MM/YYYY') AS data_finalizacao
+      FROM   atividades 
       WHERE  id_tcc = ${id_tcc}
             AND data_finalizacao IS NULL
-      ORDER BY tasks.previsao_entrega;
+      ORDER BY atividades.previsao_entrega;
 
       `)) as TaskDTO[];
 
@@ -180,8 +180,8 @@ export class TasksService {
 
   async getTasksCount(id_tcc: number): Promise<TasksCount[]> {
     const tasks = await this.database.execute(sql`
-      select tasks.id, tasks.previsao_entrega, tasks.data_criacao, tasks.data_finalizacao 
-      from tasks 
+      select atividades.id, atividades.previsao_entrega, atividades.data_criacao, atividades.data_finalizacao 
+      from atividades 
       where id_tcc = ${id_tcc}
       `);
     const today = new Date();

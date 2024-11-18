@@ -27,19 +27,19 @@ export class AuthService {
 
     const [peopleExists]: any = await this.database.execute(sql`
       select
-        people.id,
-        people.nome,
-        people.senha,
-        people.id_tipo_pessoa,
-        courses.id as id_curso 
+        usuario.id,
+        usuario.nome,
+        usuario.senha,
+        usuario.id_tipo_pessoa,
+        cursos.id as id_curso 
       from
-        people 
+        usuario 
         join
-            people_courses 
-            on people_courses.people_id = people.id 
+            cursos_usuario 
+            on cursos_usuario.people_id = usuario.id 
         join
-            courses 
-            on courses.id = people_courses.course_id 
+            cursos 
+            on cursos.id = cursos_usuario.course_id 
       where
         email = ${email}
     `);

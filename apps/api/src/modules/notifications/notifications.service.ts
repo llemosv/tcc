@@ -77,8 +77,8 @@ export class NotificationsService {
       )
       .where(
         and(
-          eq(schema.notification.lida, false), // Notificações não lidas
-          eq(schema.notification.id_usuario_destinatario, userId), // Notificações destinadas ao userId
+          eq(schema.notification.lida, false),
+          eq(schema.notification.id_usuario_destinatario, userId),
         ),
       );
 

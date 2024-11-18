@@ -66,20 +66,20 @@ export class PeopleService {
     try {
       const teachers = await this.database.execute(sql`
         select
-          people.id,
-          people.nome,
-          people.email,
-          courses.name as curso 
-        from people 
+          usuario.id,
+          usuario.nome,
+          usuario.email,
+          cursos.name as curso 
+        from usuario 
           join
-              people_courses 
-              on people_courses.people_id = people.id 
+              cursos_usuario 
+              on cursos_usuario.people_id = usuario.id 
           join
-              courses 
-              on courses.id = people_courses.course_id 
+              cursos 
+              on cursos.id = cursos_usuario.course_id 
         where
-          people.id_tipo_pessoa = 'b6a95883-9949-4d23-b220-1f3af6c8f7ea'
-          and people_courses.course_id = ${id_course}
+          usuario.id_tipo_pessoa = 'b6a95883-9949-4d23-b220-1f3af6c8f7ea'
+          and cursos_usuario.course_id = ${id_course}
       `);
 
       return teachers;

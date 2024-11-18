@@ -129,11 +129,11 @@ export class TccGuidancesService {
   ): Promise<any> {
     if (respondGuidanceRequest.accept) {
       return await this.database.execute(sql`
-          UPDATE tcc_guidances SET solicitacao_aceita = true, data_aprovacao = CURRENT_DATE WHERE id = ${id}
+          UPDATE orientacoes_tcc SET solicitacao_aceita = true, data_aprovacao = CURRENT_DATE WHERE id = ${id}
       `);
     } else {
       return await this.database.execute(sql`
-        UPDATE tcc_guidances SET solicitacao_aceita = false, data_reprovacao = CURRENT_DATE, justificativa_reprovacao = ${respondGuidanceRequest.justification} WHERE id = ${id}
+        UPDATE orientacoes_tcc SET solicitacao_aceita = false, data_reprovacao = CURRENT_DATE, justificativa_reprovacao = ${respondGuidanceRequest.justification} WHERE id = ${id}
     `);
     }
   }
@@ -164,11 +164,7 @@ export class TccGuidancesService {
         orientadorPeople,
         eq(orientadorPeople.id, schema.tccGuidances.id_professor_orientador),
       )
-      .leftJoin(
-        // Adicionando o JOIN com a tabela tasks
-        schema.tasks,
-        eq(schema.tasks.id_tcc, schema.tccGuidances.id), // Ajuste conforme sua lógica de relacionamento
-      )
+      .leftJoin(schema.tasks, eq(schema.tasks.id_tcc, schema.tccGuidances.id))
       .where(
         and(
           eq(schema.tccGuidances.solicitacao_aceita, false),
