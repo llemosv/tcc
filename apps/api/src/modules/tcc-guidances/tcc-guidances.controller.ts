@@ -19,6 +19,10 @@ import {
   respondGuidanceRequestSchema,
 } from './dtos/respond-to-guidance-request.dto';
 import { AuthGuard } from '../auth/auth.guard';
+import {
+  UpdateTccThemeDTO,
+  updateTccThemeSchema,
+} from './dtos/update-tcc-theme.dto';
 
 @UseGuards(AuthGuard)
 @Controller('tccGuidances')
@@ -57,5 +61,14 @@ export class TccGuidancesController {
       id,
       respondGuidanceRequestDTO,
     );
+  }
+
+  @Put('updateTccTheme/:id')
+  async updateTccTheme(
+    @Param('id') id: string,
+    @Body(new ZodValidationPipe(updateTccThemeSchema))
+    updateTccThemeDTO: UpdateTccThemeDTO,
+  ): Promise<any> {
+    await this.tccGuidancesService.updateTccTheme(id, updateTccThemeDTO);
   }
 }

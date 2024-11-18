@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
 
+import { AlterThemeTccDialog } from '@/components/alter-theme-tcc-dialog'
 import { CreateGuidanceSolicitationDialog } from '@/components/create-guidance-solicitation-dialog'
 import { Button } from '@/components/ui/button'
 import {
@@ -70,7 +71,23 @@ export function StudentWorks() {
         works.map((work) => (
           <Card key={work.id_orientacao}>
             <CardHeader>
-              <CardTitle>{work.tema}</CardTitle>
+              <div className="flex justify-between">
+                <CardTitle>{work.tema}</CardTitle>
+
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <button
+                      className="cursor-pointer text-muted-foreground transition-colors hover:text-foreground disabled:cursor-default disabled:text-muted-foreground/50"
+                      // onClick={() => handleViewProjects(work.id_orientacao)}
+                      disabled={!work.solicitacao_aceita}
+                    >
+                      Alterar tema
+                    </button>
+                  </DialogTrigger>
+
+                  <AlterThemeTccDialog id={work.id_orientacao} />
+                </Dialog>
+              </div>
               <div className="flex justify-between">
                 <CardDescription>
                   Orientador:{' '}

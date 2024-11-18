@@ -8,6 +8,7 @@ import { CreateTccGuidanceDTO } from './dtos/create-tcc-guidance.dto';
 import { sql, and, eq, like, isNull, not } from 'drizzle-orm';
 import { RespondGuidanceRequestDTO } from './dtos/respond-to-guidance-request.dto';
 import { alias } from 'drizzle-orm/pg-core';
+import { UpdateTccThemeDTO } from './dtos/update-tcc-theme.dto';
 
 @Injectable()
 export class TccGuidancesService {
@@ -185,5 +186,14 @@ export class TccGuidancesService {
       );
 
     return await query;
+  }
+
+  async updateTccTheme(
+    id: string,
+    updateTccThemeDTO: UpdateTccThemeDTO,
+  ): Promise<void> {
+    await this.database.execute(sql`
+          UPDATE orientacoes_tcc SET tema = ${updateTccThemeDTO.theme} WHERE id = ${id}
+      `);
   }
 }
