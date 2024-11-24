@@ -53,7 +53,7 @@ export class TccGuidancesController {
 
   @Put('respondToGuidanceRequest/:id')
   async respondToGuidanceRequest(
-    @Param('id') id: number,
+    @Param('id') id: string,
     @Body(new ZodValidationPipe(respondGuidanceRequestSchema))
     respondGuidanceRequestDTO: RespondGuidanceRequestDTO,
   ): Promise<any> {

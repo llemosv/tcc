@@ -9,11 +9,13 @@ import { sql, and, eq, like, isNull, not } from 'drizzle-orm';
 import { RespondGuidanceRequestDTO } from './dtos/respond-to-guidance-request.dto';
 import { alias } from 'drizzle-orm/pg-core';
 import { UpdateTccThemeDTO } from './dtos/update-tcc-theme.dto';
+import { NotificationsService } from '../notifications/notifications.service';
 
 @Injectable()
 export class TccGuidancesService {
   constructor(
     @Inject(DRIZZLE_ORM) private database: PostgresJsDatabase<typeof schema>,
+    private readonly notificationsService: NotificationsService,
   ) {}
 
   private readonly logger = new Logger(TccGuidancesService.name);
@@ -27,12 +29,28 @@ export class TccGuidancesService {
       previsao_entrega,
     } = createSolicitationDto;
 
-    await this.database.insert(schema.tccGuidances).values({
-      id_aluno_solicitante,
-      id_professor_orientador,
-      solicitacao_aceita,
-      tema,
-      previsao_entrega,
+    const [solicitation] = await this.database
+      .insert(schema.tccGuidances)
+      .values({
+        id_aluno_solicitante,
+        id_professor_orientador,
+        solicitacao_aceita,
+        tema,
+        previsao_entrega,
+      })
+      .returning();
+
+    const [user] = await this.database
+      .select()
+      .from(schema.people)
+      .where(eq(schema.people.id, solicitation.id_aluno_solicitante));
+
+    await this.notificationsService.create({
+      recipientUserId: solicitation.id_professor_orientador,
+      senderUserId: solicitation.id_aluno_solicitante,
+      message: `Nova solicitação de orientação de ${user.nome}.`,
+      type: 'revisaoAtv',
+      referenceId: solicitation.id,
     });
   }
 
@@ -125,9 +143,22 @@ export class TccGuidancesService {
   }
 
   async respondToGuidanceRequest(
-    id: number,
+    id: string,
     respondGuidanceRequest: RespondGuidanceRequestDTO,
   ): Promise<any> {
+    const [work] = await this.database
+      .select()
+      .from(schema.tccGuidances)
+      .where(eq(schema.tccGuidances.id, id));
+
+    await this.notificationsService.create({
+      recipientUserId: work.id_aluno_solicitante,
+      senderUserId: work.id_professor_orientador,
+      message: `Resposta na solicitação de orientação do trabalho: ${work.tema}.`,
+      type: 'novaAtividade',
+      referenceId: work.id,
+    });
+
     if (respondGuidanceRequest.accept) {
       return await this.database.execute(sql`
           UPDATE orientacoes_tcc SET solicitacao_aceita = true, data_aprovacao = CURRENT_DATE WHERE id = ${id}
@@ -192,6 +223,19 @@ export class TccGuidancesService {
     id: string,
     updateTccThemeDTO: UpdateTccThemeDTO,
   ): Promise<void> {
+    const [work] = await this.database
+      .select()
+      .from(schema.tccGuidances)
+      .where(eq(schema.tccGuidances.id, id));
+
+    await this.notificationsService.create({
+      recipientUserId: work.id_aluno_solicitante,
+      senderUserId: work.id_professor_orientador,
+      message: `Tema do trabalho: ${work.tema} alterado para: ${updateTccThemeDTO.theme}.`,
+      type: 'novaAtividade',
+      referenceId: work.id,
+    });
+
     await this.database.execute(sql`
           UPDATE orientacoes_tcc SET tema = ${updateTccThemeDTO.theme} WHERE id = ${id}
       `);

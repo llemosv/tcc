@@ -29,9 +29,10 @@ export class TopicsGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   @SubscribeMessage('sendMessage')
-  async handleMessage(_: Socket, payload: CreateTopicMessageDTO) {
+  async handleMessage(_: Socket, payload: any) {
+    console.log(payload);
     const response = await this.topicsService.createMessage({
-      id_topico: payload.id_topico,
+      id_topico: payload.id_topic,
       id_autor: payload.id_autor,
       conteudo: payload.conteudo,
     });

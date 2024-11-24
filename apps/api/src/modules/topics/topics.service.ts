@@ -48,7 +48,7 @@ export class TopicsService {
     return response;
   }
 
-  async createMessage(createTopicMessageDTO: CreateTopicMessageDTO): Promise<{
+  async createMessage(createTopicMessageDTO: any): Promise<{
     id: string;
     data_criacao: string;
     id_topico: string;
@@ -56,10 +56,10 @@ export class TopicsService {
     conteudo: string;
   }> {
     const { id_topico, id_autor, conteudo } = createTopicMessageDTO;
-
+    console.log(id_topico, id_autor, conteudo);
     const [response] = await this.database
       .insert(schema.topicMessages)
-      .values({ id_topico, id_autor, conteudo })
+      .values({ id_topico: id_topico, id_autor, conteudo })
       .returning();
 
     return response;

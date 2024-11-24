@@ -21,4 +21,13 @@ export class PeopleController {
   async getTeachers(@Param('id_course') id_course: number) {
     return await this.peopleService.getTeachers(id_course);
   }
+
+  @Get('getPeopleTypes')
+  async getPeopleTypes() {
+    return await this.peopleService.getPeopleTypes();
+  }
+  @Get('getCourses')
+  async getCourses() {
+    return await this.peopleService.getCourses();
+  }
 }

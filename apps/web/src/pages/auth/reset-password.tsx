@@ -80,6 +80,7 @@ const Step2 = ({ onSubmit }: { onSubmit: (data: Step2Form) => void }) => {
       className="space-y-4"
       autoComplete="off"
     >
+      <p className="text-sm text-muted-foreground">Mínimo de caracteres: 8</p>
       <div className="space-y-2">
         <Label htmlFor="novaSenha">Nova Senha</Label>
         <Input

@@ -87,4 +87,44 @@ export class PeopleService {
       throw new BadRequestException(error);
     }
   }
+
+  async getPeopleTypes(): Promise<
+    {
+      id: string;
+      type: string;
+    }[]
+  > {
+    try {
+      const types = await this.database
+        .select({
+          id: schema.peopleTypes.id,
+          type: schema.peopleTypes.tipo,
+        })
+        .from(schema.peopleTypes);
+
+      return types;
+    } catch (error) {
+      throw new BadRequestException(error);
+    }
+  }
+
+  async getCourses(): Promise<
+    {
+      id: string;
+      type: string;
+    }[]
+  > {
+    try {
+      const courses = await this.database
+        .select({
+          id: schema.courses.id,
+          type: schema.courses.name,
+        })
+        .from(schema.courses);
+
+      return courses;
+    } catch (error) {
+      throw new BadRequestException(error);
+    }
+  }
 }

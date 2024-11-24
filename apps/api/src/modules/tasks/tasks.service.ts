@@ -83,6 +83,25 @@ export class TasksService {
     await this.database.execute(sql`
       UPDATE atividades SET data_pendente_revisao = CURRENT_DATE WHERE id = ${id}
   `);
+
+    const [work] = await this.database
+      .select({
+        id: schema.tccGuidances.id,
+        id_aluno_solicitante: schema.tccGuidances.id_aluno_solicitante,
+        id_professor_orientador: schema.tccGuidances.id_professor_orientador,
+        tema: schema.tccGuidances.tema,
+      })
+      .from(schema.tccGuidances)
+      .innerJoin(schema.tasks, eq(schema.tasks.id_tcc, schema.tccGuidances.id))
+      .where(eq(schema.tasks.id, id));
+
+    await this.notificationsService.create({
+      recipientUserId: work.id_professor_orientador,
+      senderUserId: work.id_aluno_solicitante,
+      message: `Nova solicitação para revisar atividade no TCC ${work.tema}.`,
+      type: 'revisaoAtv',
+      referenceId: work.id,
+    });
   }
 
   async concludeTask(
@@ -101,6 +120,25 @@ export class TasksService {
           justificativa = ${justification}
       WHERE id = ${id}
   `);
+
+    const [work] = await this.database
+      .select({
+        id: schema.tccGuidances.id,
+        id_aluno_solicitante: schema.tccGuidances.id_aluno_solicitante,
+        id_professor_orientador: schema.tccGuidances.id_professor_orientador,
+        tema: schema.tccGuidances.tema,
+      })
+      .from(schema.tccGuidances)
+      .innerJoin(schema.tasks, eq(schema.tasks.id_tcc, schema.tccGuidances.id))
+      .where(eq(schema.tasks.id, id));
+
+    await this.notificationsService.create({
+      recipientUserId: work.id_aluno_solicitante,
+      senderUserId: work.id_professor_orientador,
+      message: `Atividade revisada no TCC ${work.tema}.`,
+      type: 'revisaoAtv',
+      referenceId: work.id,
+    });
   }
 
   async getTasks(

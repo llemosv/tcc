@@ -4,7 +4,7 @@ import { Inject, Injectable } from '@nestjs/common';
 
 import { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 import { DRIZZLE_ORM } from 'src/core/constrants/db.constants';
-import { and, eq } from 'drizzle-orm';
+import { and, eq, sql } from 'drizzle-orm';
 import { CreateNotificationDTO } from './dtos/create-notification.dto';
 import { NotificationsGateway } from './notifications.gateway';
 @Injectable()
@@ -34,7 +34,9 @@ export class NotificationsService {
   }: CreateNotificationDTO): Promise<void> {
     const idType = await this.getNotificationTypeId(type);
 
-    if (!idType) return;
+    if (!idType) {
+      return;
+    }
 
     const [notification] = await this.database
       .insert(schema.notification)
@@ -83,5 +85,11 @@ export class NotificationsService {
       );
 
     return notifications;
+  }
+
+  async readAll(userId: string): Promise<void> {
+    await this.database.execute(sql`
+      UPDATE notificacao SET lida = TRUE WHERE id_usuario_destinatario = ${userId}
+      `);
   }
 }

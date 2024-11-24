@@ -1,4 +1,4 @@
-import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Bell, Info } from 'lucide-react'
 import { useEffect } from 'react'
 import { io } from 'socket.io-client'
@@ -7,6 +7,7 @@ import {
   getPendingNotifications,
   Notification,
 } from '@/api/get-pending-notifications'
+import { readAllNotifications } from '@/api/read-all-notifications'
 import { env } from '@/env'
 import { useAuth } from '@/hooks/useAuth'
 
@@ -29,6 +30,13 @@ export function NotificationsMenu() {
     queryKey: ['pending-notifications', user?.id],
     queryFn: () => getPendingNotifications(user?.id!),
     enabled: !!user?.id,
+  })
+
+  const { mutateAsync: readAll } = useMutation({
+    mutationFn: readAllNotifications,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['pending-notifications'] })
+    },
   })
 
   useEffect(() => {
@@ -55,6 +63,10 @@ export function NotificationsMenu() {
     }
   }, [user?.id, queryClient])
 
+  async function handleReadAllNotifications() {
+    if (user?.id) await readAll(user?.id)
+  }
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -65,7 +77,10 @@ export function NotificationsMenu() {
       <DropdownMenuContent align="end" className="w-96">
         <div className="flex w-full items-center justify-between p-3">
           <h1 className="font-semibold">Notificações</h1>
-          <span className="cursor-pointer text-[0.75rem] text-muted-foreground transition-colors hover:text-foreground">
+          <span
+            className="cursor-pointer text-[0.75rem] text-muted-foreground transition-colors hover:text-foreground"
+            onClick={handleReadAllNotifications}
+          >
             Marcar todas como lidas
           </span>
         </div>
@@ -91,13 +106,13 @@ export function NotificationsMenu() {
           <p className="p-4 text-muted-foreground">Nenhuma notificação nova</p>
         )}
 
-        <DropdownMenuSeparator />
+        {/* <DropdownMenuSeparator /> */}
 
-        <DropdownMenuItem asChild>
+        {/* <DropdownMenuItem asChild>
           <button className="flex w-full cursor-pointer items-center justify-center gap-4 p-2">
             <span className="font-semibold text-primary">Ver todas</span>
           </button>
-        </DropdownMenuItem>
+        </DropdownMenuItem> */}
       </DropdownMenuContent>
     </DropdownMenu>
   )
