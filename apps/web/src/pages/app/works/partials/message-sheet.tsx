@@ -59,6 +59,7 @@ export function MessageSheet({ topic, idTopic }: MessageSheetProps) {
     socket.emit('joinTopic', idTopic)
 
     socket.on('receiveMessage', (newMessage: TopicMessage) => {
+      console.log(newMessage)
       if (newMessage.id_topic === idTopic) {
         queryClient.setQueryData(
           ['topic-message', idTopic],

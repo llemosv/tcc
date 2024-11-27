@@ -46,6 +46,7 @@ export class TccGuidancesController {
   ) {
     return await this.tccGuidancesService.findGuidances(id, type, name, status);
   }
+
   @Get('findPendingGuidances/:id')
   async findPendingGuidances(@Param('id') id: string) {
     return await this.tccGuidancesService.findPendingGuidances(id);
@@ -70,5 +71,15 @@ export class TccGuidancesController {
     updateTccThemeDTO: UpdateTccThemeDTO,
   ): Promise<any> {
     await this.tccGuidancesService.updateTccTheme(id, updateTccThemeDTO);
+  }
+
+  @Get('getGuidancesCount/:id_course')
+  async getGuidancesCount(@Param('id_course') id_course: string) {
+    return await this.tccGuidancesService.getGuidancesCount(id_course);
+  }
+
+  @Get('getTeacherGuidancesCount/:id_course')
+  async getTeacherGuidancesCount(@Param('id_course') id_course: string) {
+    return await this.tccGuidancesService.getTeacherGuidancesCount(id_course);
   }
 }

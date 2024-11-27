@@ -240,4 +240,44 @@ export class TccGuidancesService {
           UPDATE orientacoes_tcc SET tema = ${updateTccThemeDTO.theme} WHERE id = ${id}
       `);
   }
+
+  async getTeacherGuidancesCount(id_course: string): Promise<
+    {
+      professor: string;
+      numero_trabalhos: number;
+    }[]
+  > {
+    const data = await this.database.execute<{
+      professor: string;
+      numero_trabalhos: number;
+    }>(sql`
+      SELECT usuario.nome AS professor,
+            count(*) AS numero_trabalhos
+      FROM orientacoes_tcc
+      INNER JOIN usuario ON usuario.id = orientacoes_tcc.id_professor_orientador
+      INNER JOIN cursos_usuario ON cursos_usuario.course_id = ${id_course}
+      AND cursos_usuario.people_id = orientacoes_tcc.id_professor_orientador
+      GROUP BY usuario.nome
+      `);
+
+    return data;
+  }
+
+  async getGuidancesCount(id_course: string): Promise<
+    {
+      count: number;
+    }[]
+  > {
+    const data = await this.database.execute<{
+      count: number;
+    }>(sql`
+      SELECT count(DISTINCT orientacoes_tcc.tema)
+      FROM orientacoes_tcc
+      INNER JOIN usuario ON usuario.id = orientacoes_tcc.id_professor_orientador
+      INNER JOIN cursos_usuario ON cursos_usuario.course_id = ${id_course}
+      AND cursos_usuario.people_id = orientacoes_tcc.id_professor_orientador
+      `);
+
+    return data;
+  }
 }
