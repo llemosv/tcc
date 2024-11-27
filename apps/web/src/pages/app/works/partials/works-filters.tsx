@@ -129,34 +129,37 @@ export function WorkFilters() {
           )
         }}
       />
-      <Controller
-        name="teacher"
-        control={control}
-        render={({ field: { name, onChange, value, disabled } }) => {
-          return (
-            <Select
-              defaultValue="all"
-              name={name}
-              onValueChange={onChange}
-              value={value}
-              disabled={disabled}
-            >
-              <SelectTrigger className="h-8 w-[180px]">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Todos professores</SelectItem>
-                {teachers &&
-                  teachers.map((item) => (
-                    <SelectItem key={item.id} value={item.id}>
-                      {item.nome}
-                    </SelectItem>
-                  ))}
-              </SelectContent>
-            </Select>
-          )
-        }}
-      />
+      {user?.tipo_pessoa === '57e83fe5-bd2c-4473-bebc-b5de48095b32' && (
+        <Controller
+          name="teacher"
+          control={control}
+          render={({ field: { name, onChange, value, disabled } }) => {
+            return (
+              <Select
+                defaultValue="all"
+                name={name}
+                onValueChange={onChange}
+                value={value}
+                disabled={disabled}
+              >
+                <SelectTrigger className="h-8 w-[180px]">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Todos professores</SelectItem>
+                  {teachers &&
+                    teachers.map((item) => (
+                      <SelectItem key={item.id} value={item.id}>
+                        {item.nome}
+                      </SelectItem>
+                    ))}
+                </SelectContent>
+              </Select>
+            )
+          }}
+        />
+      )}
+
       <Button variant="secondary" size="xs" type="submit">
         <Search className="mr-2 h-4 w-4" />
         Filtrar resultados

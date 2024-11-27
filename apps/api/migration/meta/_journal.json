@@ -36,6 +36,13 @@
       "when": 1731952978282,
       "tag": "0004_keen_blue_shield",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1732718290703,
+      "tag": "0005_add-column-data-finalizacao",
+      "breakpoints": true
     }
   ]
 }

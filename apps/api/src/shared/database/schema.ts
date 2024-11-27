@@ -65,6 +65,7 @@ export const tccGuidances = pgTable('orientacoes_tcc', {
   justificativaReprovacao: text('justificativa_reprovacao'),
   data_aprovacao: date('data_aprovacao'),
   data_reprovacao: date('data_reprovacao'),
+  data_finalizacao: date('data_finalizacao'),
 });
 
 export const tasks = pgTable('atividades', {

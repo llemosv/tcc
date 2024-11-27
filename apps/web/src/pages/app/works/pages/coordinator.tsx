@@ -1,8 +1,10 @@
 import { useQuery } from '@tanstack/react-query'
+import { Check, CheckCheckIcon, SquareCheck } from 'lucide-react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 
 import { AcceptSolicitationDialog } from '@/components/accept-solicitation-dialog'
 import { AlterThemeTccDialog } from '@/components/alter-theme-tcc-dialog'
+import { ConcludeTccDialog } from '@/components/conclude-tcc-dialog'
 import {
   Card,
   CardContent,
@@ -11,6 +13,12 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 import { Dialog, DialogTrigger } from '@/components/ui/dialog'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip'
 import { useAuth } from '@/hooks/useAuth'
 import { cn } from '@/lib/utils'
 import { getUserType } from '@/utils/get-user-type'
@@ -69,7 +77,27 @@ export function CoordinatorWorks() {
               <Card key={work.id_orientacao}>
                 <CardHeader>
                   <div className="flex justify-between">
-                    <CardTitle>{work.tema}</CardTitle>
+                    <CardTitle className="flex gap-3 text-center">
+                      {work.tema}
+                      {work.solicitacao_aceita && !work.data_finalizacao && (
+                        <Dialog>
+                          <DialogTrigger>
+                            <TooltipProvider>
+                              <Tooltip>
+                                <TooltipTrigger>
+                                  <SquareCheck className="hover:cursor-pointer hover:text-emerald-600" />
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  <p>Marcar como concluído</p>
+                                </TooltipContent>
+                              </Tooltip>
+                            </TooltipProvider>
+                          </DialogTrigger>
+
+                          <ConcludeTccDialog id_tcc={work.id_orientacao} />
+                        </Dialog>
+                      )}
+                    </CardTitle>
 
                     <Dialog>
                       <DialogTrigger asChild>
@@ -117,11 +145,13 @@ export function CoordinatorWorks() {
                     >
                       Status orientação:{' '}
                       <span className="font-semibold">
-                        {!work.solicitacao_aceita && !work.data_reprovacao
-                          ? 'Pendente'
-                          : !work.solicitacao_aceita && work.data_reprovacao
-                            ? 'Recusada'
-                            : 'Aceita'}
+                        {work.data_finalizacao
+                          ? 'Concluído'
+                          : !work.solicitacao_aceita && !work.data_reprovacao
+                            ? 'Pendente'
+                            : !work.solicitacao_aceita && work.data_reprovacao
+                              ? 'Recusada'
+                              : 'Aceita'}
                       </span>
                     </CardDescription>
                     {work.justificativa_reprovacao && (
@@ -133,6 +163,24 @@ export function CoordinatorWorks() {
                       </CardDescription>
                     )}
                   </div>
+                  {work.data_finalizacao && (
+                    <div className="flex justify-between">
+                      <CardDescription>
+                        Data finalização:{' '}
+                        <span className="font-semibold">
+                          {work.data_finalizacao}
+                        </span>
+                      </CardDescription>
+                      {work.justificativa_reprovacao && (
+                        <CardDescription>
+                          Justificativa:{' '}
+                          <span className="font-semibold">
+                            {work.justificativa_reprovacao}
+                          </span>
+                        </CardDescription>
+                      )}
+                    </div>
+                  )}
                 </CardHeader>
                 <CardContent className="flex justify-between">
                   <p>

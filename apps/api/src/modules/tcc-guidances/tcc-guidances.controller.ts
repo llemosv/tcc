@@ -91,4 +91,9 @@ export class TccGuidancesController {
   async getTeacherGuidancesCount(@Param('id_course') id_course: string) {
     return await this.tccGuidancesService.getTeacherGuidancesCount(id_course);
   }
+
+  @Post('conclude/:id_tcc')
+  async conclude(@Param('id_tcc') id_tcc: string) {
+    return await this.tccGuidancesService.concludeGuidance(id_tcc);
+  }
 }

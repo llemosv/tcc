@@ -9,6 +9,7 @@ export interface Guidance {
   solicitacao_aceita: boolean
   data_aprovacao: string | null
   data_reprovacao: string | null
+  data_finalizacao: string | null
   justificativa_reprovacao: string | null
   total_atividades: number
 }

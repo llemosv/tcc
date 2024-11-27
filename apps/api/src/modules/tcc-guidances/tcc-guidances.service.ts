@@ -116,6 +116,7 @@ export class TccGuidancesService {
         solicitacao_aceita: schema.tccGuidances.solicitacao_aceita,
         data_aprovacao: sql<string>`TO_CHAR(${schema.tccGuidances.data_aprovacao}, 'DD/MM/YYYY')`,
         data_reprovacao: sql<string>`TO_CHAR(${schema.tccGuidances.data_reprovacao}, 'DD/MM/YYYY')`,
+        data_finalizacao: sql<string>`TO_CHAR(${schema.tccGuidances.data_finalizacao}, 'DD/MM/YYYY')`,
         justificativa_reprovacao: schema.tccGuidances.justificativaReprovacao,
         total_atividades: sql<number>`COUNT(${schema.tasks.id})`,
       })
@@ -295,5 +296,11 @@ export class TccGuidancesService {
       `);
 
     return data;
+  }
+
+  async concludeGuidance(id_tcc: string): Promise<void> {
+    await this.database.execute(sql`
+        UPDATE orientacoes_tcc SET data_finalizacao = CURRENT_DATE WHERE id = ${id_tcc}
+        `);
   }
 }
