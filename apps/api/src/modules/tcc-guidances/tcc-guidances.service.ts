@@ -56,18 +56,25 @@ export class TccGuidancesService {
 
   async findGuidances(
     id: string,
-    type: 'aluno' | 'orientador',
+    type: 'aluno' | 'orientador' | 'coordenador',
     name?: string,
     status?: 'refused' | 'pending' | 'accepted',
+    teacher?: string,
+    id_course?: string,
   ): Promise<any> {
     const alunoPeople = alias(schema.people, 'aluno');
     const orientadorPeople = alias(schema.people, 'orientador');
+    const cursosUsuario = alias(schema.peopleCourses, 'cursosUsuario');
 
-    const conditions = [
-      type === 'aluno'
-        ? eq(schema.tccGuidances.id_aluno_solicitante, id)
-        : eq(schema.tccGuidances.id_professor_orientador, id),
-    ];
+    const conditions = [];
+
+    if (type === 'aluno') {
+      conditions.push(eq(schema.tccGuidances.id_aluno_solicitante, id));
+    } else if (type === 'orientador') {
+      conditions.push(eq(schema.tccGuidances.id_professor_orientador, id));
+    } else if (type === 'coordenador') {
+      conditions.push(eq(cursosUsuario.people_id, orientadorPeople.id));
+    }
 
     if (name) {
       conditions.push(
@@ -88,7 +95,7 @@ export class TccGuidancesService {
         case 'pending':
           conditions.push(
             and(
-              isNull(schema.tccGuidances.solicitacao_aceita),
+              eq(schema.tccGuidances.solicitacao_aceita, false),
               isNull(schema.tccGuidances.data_reprovacao),
             ),
           );
@@ -96,6 +103,9 @@ export class TccGuidancesService {
       }
     }
 
+    if (teacher) {
+      conditions.push(eq(schema.tccGuidances.id_professor_orientador, teacher));
+    }
     const query = this.database
       .select({
         id_orientacao: schema.tccGuidances.id,
@@ -118,7 +128,13 @@ export class TccGuidancesService {
         orientadorPeople,
         eq(orientadorPeople.id, schema.tccGuidances.id_professor_orientador),
       )
-      .leftJoin(schema.tasks, eq(schema.tasks.id_tcc, schema.tccGuidances.id))
+      .leftJoin(schema.tasks, eq(schema.tasks.id_tcc, schema.tccGuidances.id));
+
+    if (type === 'coordenador') {
+      query.innerJoin(cursosUsuario, eq(cursosUsuario.course_id, id_course));
+    }
+
+    query
       .where(and(...conditions))
       .groupBy(
         schema.tccGuidances.id,
@@ -133,10 +149,10 @@ export class TccGuidancesService {
       )
       .orderBy(
         sql`CASE 
-               WHEN ${schema.tccGuidances.solicitacao_aceita} = true THEN 1 
-               WHEN ${schema.tccGuidances.solicitacao_aceita} IS NULL AND ${schema.tccGuidances.data_reprovacao} IS NULL THEN 2 
-               ELSE 3 
-             END`,
+                   WHEN ${schema.tccGuidances.solicitacao_aceita} = true THEN 1 
+                   WHEN ${schema.tccGuidances.solicitacao_aceita} IS NULL AND ${schema.tccGuidances.data_reprovacao} IS NULL THEN 2 
+                   ELSE 3 
+                 END`,
       );
 
     return await query;

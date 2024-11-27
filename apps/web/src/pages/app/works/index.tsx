@@ -2,6 +2,7 @@ import { Helmet } from 'react-helmet-async'
 
 import { useAuth } from '@/hooks/useAuth'
 
+import { CoordinatorWorks } from './pages/coordinator'
 import { StudentWorks } from './pages/student'
 import { TeacherWorks } from './pages/teacher'
 
@@ -12,7 +13,9 @@ export function Works() {
     <>
       <Helmet title="Trabalhos" />
 
-      {/* {user?.tipo_pessoa === 1 && <CoordinatorWorks />} */}
+      {user?.tipo_pessoa === '57e83fe5-bd2c-4473-bebc-b5de48095b32' && (
+        <CoordinatorWorks />
+      )}
       {user?.tipo_pessoa === 'b6a95883-9949-4d23-b220-1f3af6c8f7ea' && (
         <TeacherWorks />
       )}
@@ -21,5 +24,4 @@ export function Works() {
       )}
     </>
   )
-  return <></>
 }

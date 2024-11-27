@@ -1,7 +1,7 @@
 import { api } from '@/lib/axios'
 
 export interface Teacher {
-  id: number
+  id: string
   nome: string
   email: string
   curso: string

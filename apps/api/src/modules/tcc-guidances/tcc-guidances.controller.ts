@@ -43,8 +43,17 @@ export class TccGuidancesController {
     @Param('type') type: 'aluno' | 'orientador',
     @Query('name') name?: string,
     @Query('status') status?: 'refused' | 'pending' | 'accepted',
+    @Query('teacher') teacher?: string,
+    @Query('idCourse') idCourse?: string,
   ) {
-    return await this.tccGuidancesService.findGuidances(id, type, name, status);
+    return await this.tccGuidancesService.findGuidances(
+      id,
+      type,
+      name,
+      status,
+      teacher,
+      idCourse,
+    );
   }
 
   @Get('findPendingGuidances/:id')

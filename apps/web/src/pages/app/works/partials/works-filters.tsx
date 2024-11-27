@@ -1,9 +1,11 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useQuery } from '@tanstack/react-query'
 import { Search, X } from 'lucide-react'
 import { Controller, useForm } from 'react-hook-form'
 import { useSearchParams } from 'react-router-dom'
 import { z } from 'zod'
 
+import { getTeachers } from '@/api/get-teachers'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import {
@@ -13,15 +15,19 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { useAuth } from '@/hooks/useAuth'
 
 const workFiltersSchema = z.object({
   name: z.string().optional(),
   status: z.string().optional(),
+  teacher: z.string().optional(),
 })
 
 type WorkFiltersSchema = z.infer<typeof workFiltersSchema>
 
 export function WorkFilters() {
+  const { user } = useAuth()
+
   const [searchParams, setSearchParams] = useSearchParams()
 
   const name = searchParams.get('name')
@@ -32,12 +38,18 @@ export function WorkFilters() {
       resolver: zodResolver(workFiltersSchema),
       defaultValues: {
         name: name ?? '',
+        teacher: name ?? 'all',
         status: status ?? 'all',
       },
     },
   )
 
-  function handleFilter({ name, status }: WorkFiltersSchema) {
+  const { data: teachers } = useQuery({
+    queryKey: ['teachers', user!.id_curso],
+    queryFn: () => getTeachers(user!.id_curso),
+  })
+
+  function handleFilter({ name, status, teacher }: WorkFiltersSchema) {
     setSearchParams((state) => {
       if (name) {
         state.set('name', name)
@@ -51,6 +63,12 @@ export function WorkFilters() {
         state.delete('status')
       }
 
+      if (teacher) {
+        state.set('teacher', teacher)
+      } else {
+        state.delete('teacher')
+      }
+
       state.set('page', '1')
 
       return state
@@ -61,6 +79,7 @@ export function WorkFilters() {
     setSearchParams((state) => {
       state.delete('name')
       state.delete('status')
+      state.delete('teacher')
       state.set('page', '1')
 
       return state
@@ -69,6 +88,7 @@ export function WorkFilters() {
     reset({
       name: '',
       status: 'all',
+      teacher: 'all',
     })
   }
 
@@ -108,7 +128,35 @@ export function WorkFilters() {
             </Select>
           )
         }}
-      ></Controller>
+      />
+      <Controller
+        name="teacher"
+        control={control}
+        render={({ field: { name, onChange, value, disabled } }) => {
+          return (
+            <Select
+              defaultValue="all"
+              name={name}
+              onValueChange={onChange}
+              value={value}
+              disabled={disabled}
+            >
+              <SelectTrigger className="h-8 w-[180px]">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Todos professores</SelectItem>
+                {teachers &&
+                  teachers.map((item) => (
+                    <SelectItem key={item.id} value={item.id}>
+                      {item.nome}
+                    </SelectItem>
+                  ))}
+              </SelectContent>
+            </Select>
+          )
+        }}
+      />
       <Button variant="secondary" size="xs" type="submit">
         <Search className="mr-2 h-4 w-4" />
         Filtrar resultados
