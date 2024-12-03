@@ -8,11 +8,14 @@ import { eq, sql } from 'drizzle-orm';
 import { CreateTopicDTO, TopicDTO } from './dtos/create-topic.dto';
 import { CreateTopicMessageDTO } from './dtos/create-topic-message.dto';
 import { TopicMessageDTO } from './dtos/topic-message.dto';
+import { join } from 'path';
+import { S3Service } from 'src/shared/s3Provider/s3.service';
 
 @Injectable()
 export class TopicsService {
   constructor(
     @Inject(DRIZZLE_ORM) private database: PostgresJsDatabase<typeof schema>,
+    private s3Service: S3Service,
   ) {}
 
   private readonly logger = new Logger(TopicsService.name);
@@ -134,5 +137,39 @@ export class TopicsService {
           justificativa = ${justification}
       WHERE id = ${id}
   `);
+  }
+
+  async uploadFile(
+    idTopic: string,
+    fileName: string,
+    fileType: string,
+  ): Promise<void> {
+    const fileFolder = join(__dirname, '../../../../tmp');
+    console.log(idTopic, fileName, `${fileFolder}/${fileName}`);
+
+    await this.s3Service.uploadFile(`${fileFolder}/${fileName}`, fileType);
+
+    await this.database.insert(schema.topicFiles).values({
+      id_topico: idTopic,
+      nome_arquivo: fileName,
+      caminho: process.env.BUCKET_FILE_URL + '/' + fileName,
+    });
+  }
+
+  async getFilesTopic(idTopic: string): Promise<
+    {
+      id: string;
+      id_topico: string;
+      nome_arquivo: string;
+      caminho: string;
+      data_upload: string;
+    }[]
+  > {
+    const result = await this.database
+      .select()
+      .from(schema.topicFiles)
+      .where(eq(schema.topicFiles.id_topico, idTopic));
+
+    return result;
   }
 }

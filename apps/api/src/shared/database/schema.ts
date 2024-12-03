@@ -119,9 +119,9 @@ export const topicFiles = pgTable('arquivos_topico', {
   id: uuid('id')
     .primaryKey()
     .default(sql`gen_random_uuid()`),
-  id_mensagem_topico: uuid('id_mensagem_topico')
+  id_topico: uuid('id_topico')
     .notNull()
-    .references(() => topicMessages.id),
+    .references(() => taskTopics.id),
   nome_arquivo: varchar('nome_arquivo', { length: 255 }).notNull(),
   caminho: text('caminho').notNull(),
   data_upload: timestamp('data_upload', { mode: 'string' })

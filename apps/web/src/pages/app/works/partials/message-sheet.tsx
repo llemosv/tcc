@@ -1,13 +1,16 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Paperclip } from 'lucide-react'
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { io } from 'socket.io-client'
 import { z } from 'zod'
 
 import { Topics } from '@/api/get-task-topics'
+import { getTopicFiles } from '@/api/get-topic-files'
 import { getMessages, TopicMessage } from '@/api/get-topic-messages'
+import { uploadFile } from '@/api/upload-file'
+import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Separator } from '@/components/ui/separator'
 import {
@@ -50,6 +53,32 @@ export function MessageSheet({ topic, idTopic }: MessageSheetProps) {
     queryFn: () => getMessages(idTopic),
     enabled: !!idTopic,
   })
+  const { data: topicFiles } = useQuery({
+    queryKey: ['topic-files', idTopic],
+    queryFn: () => getTopicFiles(idTopic),
+    enabled: !!idTopic,
+  })
+
+  const { mutateAsync: uploadFileMutation } = useMutation({
+    mutationFn: uploadFile,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['topic-files'] })
+    },
+    onError: (error) => {
+      console.error('Erro ao fazer upload:', error)
+    },
+  })
+
+  async function handleFileChange(event: React.ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0]
+    if (file) {
+      console.log(file)
+      await uploadFileMutation({
+        id_topico: idTopic,
+        file,
+      })
+    }
+  }
 
   const { handleSubmit, register, reset } = useForm<SendMessageSchema>({
     resolver: zodResolver(sendMessageSchema),
@@ -98,6 +127,23 @@ export function MessageSheet({ topic, idTopic }: MessageSheetProps) {
           <SheetTitle>{topic.titulo}</SheetTitle>
           <SheetDescription>{topic.descricao}</SheetDescription>
         </SheetHeader>
+        {topicFiles && topicFiles.length > 0 && (
+          <div className="mt-4 max-h-12">
+            <SheetTitle className="text-sm">Arquivos enviados:</SheetTitle>
+            <div className="flex max-h-12 flex-col items-start overflow-auto ">
+              {topicFiles.map((file) => (
+                <Button
+                  key={file.id}
+                  variant="link"
+                  className=" p-[0.1rem] text-sm"
+                  onClick={() => window.open(file.caminho, '_blank')}
+                >
+                  {file.nome_arquivo}
+                </Button>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
       <div className="no-scrollbar max-h-[50rem] overflow-auto">
@@ -136,11 +182,17 @@ export function MessageSheet({ topic, idTopic }: MessageSheetProps) {
           className="flex w-full items-center gap-4"
         >
           <Input {...register('conteudo')} autoComplete="off" />
-          <button className="flex  text-muted-foreground transition-colors hover:text-foreground">
+          <button
+            type="button"
+            onClick={() => document.getElementById('fileInput')?.click()}
+            className="flex text-muted-foreground transition-colors hover:text-foreground"
+          >
             <TooltipProvider>
               <Tooltip>
-                <TooltipTrigger>
-                  <Paperclip />
+                <TooltipTrigger asChild>
+                  <span>
+                    <Paperclip />
+                  </span>
                 </TooltipTrigger>
                 <TooltipContent>
                   <p>Anexar arquivo</p>
@@ -148,6 +200,13 @@ export function MessageSheet({ topic, idTopic }: MessageSheetProps) {
               </Tooltip>
             </TooltipProvider>
           </button>
+
+          <input
+            id="fileInput"
+            type="file"
+            className="hidden"
+            onChange={handleFileChange}
+          />
         </form>
       </SheetFooter>
     </SheetContent>

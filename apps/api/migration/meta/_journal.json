@@ -43,6 +43,13 @@
       "when": 1732718290703,
       "tag": "0005_add-column-data-finalizacao",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1733262729751,
+      "tag": "0006_icy_norman_osborn",
+      "breakpoints": true
     }
   ]
 }
